@@ -10,5 +10,6 @@ const db = new pg.Client({
 })
 db.connect();
 
-export const query = (text , params) => db.query(text , params);
-export const closeConnection = () => db.end(); 
+const query = (text , params) => db.query(text , params);
+const closeConnection = () => db.end(); 
+export default {query , closeConnection}
