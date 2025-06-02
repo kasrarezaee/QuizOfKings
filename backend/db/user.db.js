@@ -14,6 +14,22 @@ class UserDB{
                     , registration_date , is_blocked , xp_level` , [username , email , password_hash])
         return rows;    
     }
+
+    getUserByID = async (user_id)=>{
+        const {rows} = await query('SELECT * FROM users WHERE user_id = $1' , [user_id])
+        return rows;
+    }
+
+    getUserByUserName = async (username) =>{
+        const{rows} = await query(`SELECT * FROM users WHERE username = $1` , [username])
+        return rows
+    }
+
+    deleteUserByID = async (user_id)=>{
+        
+        const {rows} = await query(`DELETE FROM users WHERE user_id=$1 RETURNING *` , [user_id])
+        return rows
+    }
 }
 
 export default new UserDB();
