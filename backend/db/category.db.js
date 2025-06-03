@@ -37,6 +37,11 @@ class CategoryDB {
     );
     return rows;
   };
+
+  getRandomCategories = async () => {
+    const { rows } = await query(`SELECT * FROM categories ORDER BY RAND() LIMIT 3`)
+    return rows;
+  }
 }
 
 export default new CategoryDB();

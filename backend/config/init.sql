@@ -39,13 +39,18 @@ CREATE TABLE sessions (
   start_time TIMESTAMP NOT NULL,
   end_time TIMESTAMP,
   winner_id INT REFERENCES users(user_id),
-  category_played INT REFERENCES categories(category_id)
 );
 
 CREATE TABLE rounds (
   round_id SERIAL PRIMARY KEY,
   session_id INT NOT NULL REFERENCES sessions(session_id),
-  round_number INT NOT NULL,
+  round_number INT NOT NULL
+  category_played INT REFERENCES categories(category_id)
+);
+
+CREATE TABLE round_questions (
+  round_question_id SERIAL PRIMARY KEY,
+  round_id INT NOT NULL REFERENCES rounds(round_id),
   question_id INT NOT NULL REFERENCES questions(question_id),
   player1_answer CORRECT_ANSWER,
   player2_answer CORRECT_ANSWER,
