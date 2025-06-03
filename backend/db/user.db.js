@@ -1,87 +1,118 @@
-import db from "../config/db.js"
-const {query , closeConnection} = db;
-class UserDB{
-    getAllUsers = async ()=>{
-        const {rows} = await query("SELECT * FROM users");
-        return rows;
-    }
-    
-    createUser = async (username , email , password_hash )=>{
-        const {rows} = await query(`INSERT INTO users(username , email , password_hash) 
+import db from "../config/db.js";
+const { query, closeConnection } = db;
+class UserDB {
+  getAllUsers = async () => {
+    const { rows } = await query("SELECT * FROM users");
+    return rows;
+  };
+
+  createUser = async (username, email, password_hash) => {
+    const { rows } = await query(
+      `INSERT INTO users(username , email , password_hash) 
                     VALUES ($1 , $2 , $3)
                     RETURNING 
                     user_id , username , email , password_hash 
-                    , registration_date , is_blocked , xp_level` , [username , email , password_hash])
-        return rows;    
-    }
+                    , registration_date , is_blocked , xp_level`,
+      [username, email, password_hash]
+    );
+    return rows;
+  };
 
-    getUserByID = async (user_id)=>{
-        const {rows} = await query('SELECT * FROM users WHERE user_id = $1' , [user_id])
-        return rows;
-    }
+  getUserByID = async (user_id) => {
+    const { rows } = await query("SELECT * FROM users WHERE user_id = $1", [
+      user_id,
+    ]);
+    return rows;
+  };
 
-    getUserByUserName = async (username) =>{
-        const{rows} = await query(`SELECT * FROM users WHERE username = $1` , [username])
-        return rows
-    }
+  getUserByUserName = async (username) => {
+    const { rows } = await query(`SELECT * FROM users WHERE username = $1`, [
+      username,
+    ]);
+    return rows;
+  };
 
-    getUserByEmail = async (email)=>{
-        const {rows} = await query(`SELECT * FROM users WHERE email = $1` , [email])
-        return rows
-    }
+  getUserByEmail = async (email) => {
+    const { rows } = await query(`SELECT * FROM users WHERE email = $1`, [
+      email,
+    ]);
+    return rows;
+  };
 
-    deleteUserByID = async (user_id)=>{
-        
-        const {rows} = await query(`DELETE FROM users WHERE user_id=$1 RETURNING *` , [user_id])
-        return rows
-    }
+  deleteUserByID = async (user_id) => {
+    const { rows } = await query(
+      `DELETE FROM users WHERE user_id=$1 RETURNING *`,
+      [user_id]
+    );
+    return rows;
+  };
 
-    checkUserExists = async (email , username) =>{
-        const {rows} = await query(`SELECT * FROM users 
-                                    WHERE username = $1 AND email = $2` , [username , email])
-        return rows.length != 0    
-    }
+  checkUserExists = async (email, username) => {
+    const { rows } = await query(
+      `SELECT * FROM users 
+                                    WHERE username = $1 AND email = $2`,
+      [username, email]
+    );
+    return rows.length != 0;
+  };
 
-    blockUser = async (user_id)=>{
-        const {rows} = await query(`UPDATE users SET is_blocked = TRUE 
+  blockUser = async (user_id) => {
+    const { rows } = await query(
+      `UPDATE users SET is_blocked = TRUE 
                                     WHERE user_id = $1 
-                                    RETURNING *` , [user_id])
-        return rows
-    }
+                                    RETURNING *`,
+      [user_id]
+    );
+    return rows;
+  };
 
-    unblockUser = async (user_id)=>{
-        const {rows} = await query(`UPDATE users SET is_blocked = FALSE 
+  unblockUser = async (user_id) => {
+    const { rows } = await query(
+      `UPDATE users SET is_blocked = FALSE 
                                     WHERE user_id = $1 
-                                    RETURNING *` , [user_id])
-        return rows
-    }
+                                    RETURNING *`,
+      [user_id]
+    );
+    return rows;
+  };
 
-    assignRole = async (user_id , role_id) =>{
-        const {rows} = await query(`INSERT INTO user_roles(user_id , role_id) 
-                                    VALUES ($1 , $2) RETURNING *` , [user_id , role_id])
-        return rows    
-    }
+  assignRole = async (user_id, role_id) => {
+    const { rows } = await query(
+      `INSERT INTO user_roles(user_id , role_id) 
+                                    VALUES ($1 , $2) RETURNING *`,
+      [user_id, role_id]
+    );
+    return rows;
+  };
 
-    deleteRole = async (user_id , role_id) =>{
-        const {rows} = await query(`DELETE FROM user_roles WHERE user_id = $1 and role_id = $2` , [user_id , role_id])
-        return rows    
-    }
+  deleteRole = async (user_id, role_id) => {
+    const { rows } = await query(
+      `DELETE FROM user_roles WHERE user_id = $1 and role_id = $2`,
+      [user_id, role_id]
+    );
+    return rows;
+  };
 
-    getUserRoles = async (user_id) =>{
-        const {rows} = await query(`SELECT R.role_name FROM users U 
+  getUserRoles = async (user_id) => {
+    const { rows } = await query(
+      `SELECT R.role_name FROM users U 
                                     JOIN user_roles UR ON U.user_id = UR.user_id 
                                     JOIN roles R ON UR.role_id = R.role_id
-                                    WHERE U.user_id = $1`, [user_id])
-        return rows;
-    }
+                                    WHERE U.user_id = $1`,
+      [user_id]
+    );
+    return rows;
+  };
 
-    updateUser = async (user_id , {username , email , password_hash})=> {
-        const {rows} = await query(`UPDATE users SET username = $1 , email = $2 , password_hash = $3 
+  updateUser = async (user_id, { username, email, password_hash }) => {
+    const { rows } = await query(
+      `UPDATE users SET username = $1 , email = $2 , password_hash = $3 
                                     WHERE user_id = $4
-                                    RETURNING *` , [username , email , password_hash , user_id])
-        return rows
-    }
+                                    RETURNING *`,
+      [username, email, password_hash, user_id]
+    );
+    return rows;
+  };
 }
 
 export default new UserDB();
-
