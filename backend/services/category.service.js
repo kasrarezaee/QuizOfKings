@@ -41,6 +41,15 @@ class CategoryService {
       throw new Error("something went wrong");
     }
   };
+
+  getRandomCategories = async () => {
+    try {
+      return await categoryDb.getRandomCategories()
+    } catch (err) {
+      throw new Error(err)
+    }
+  }
+
 }
 
 export default new CategoryService();

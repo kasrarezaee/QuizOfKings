@@ -44,6 +44,12 @@ class QuestionController {
     const result = await questionService.updateQuestion(id, question);
     res.status(200).json(result);
   };
+
+  getRandomQuestionByCategory = async (req, res) => {
+    const { id } = req.params
+    const result = await questionService.getRandomQuestionByCategory(id)
+    res.status(200).json(result)
+  }
 }
 
 export default new QuestionController();

@@ -44,7 +44,7 @@ CREATE TABLE sessions (
 CREATE TABLE rounds (
   round_id SERIAL PRIMARY KEY,
   session_id INT NOT NULL REFERENCES sessions(session_id),
-  round_number INT NOT NULL
+  round_number INT
   category_played INT REFERENCES categories(category_id)
 );
 

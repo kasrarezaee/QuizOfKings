@@ -7,11 +7,10 @@ class SessionDB {
     createSession = async (player1_id) => {
         const { random_user } = await query(`SELECT * FROM users ORDER BY RAND() LIMIT 1`)
         const { sessionCreated } = await query(`INSERT INTO sessions (player1_id , player2_id) 
-                                        VALUES($1 , $2)`
+                                        VALUES($1 , $2) RETURNING *`
             , [player1_id, parseInt(random_user[0])])
 
-        const { random_cateqories } = await categoryDb.getRandomCategories()
-        const result = { sessionCreated, random_cateqories }
+        const result = sessionCreated
         return result;
     }
 

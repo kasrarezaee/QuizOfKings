@@ -117,6 +117,13 @@ class QuestionDB {
 
     return rows;
   };
+
+  getRandomQuestionByCategory = async (category_id)=>{
+    const{rows} = query(`SELECT * FROM questions ORDER BY RAND() LIMIT 3 WHERE category_id = $1` 
+                        , [category_id])
+
+    return rows;
+  }
 }
 
 export default new QuestionDB();

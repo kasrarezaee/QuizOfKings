@@ -18,4 +18,5 @@ router
   .route("/category/:category_id")
   .get(questionController.getAllQuestionsByCategory);
 
+router.route("/random/:id").get(questionController.getRandomQuestionByCategory)
 export default router;

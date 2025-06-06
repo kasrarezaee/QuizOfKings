@@ -56,6 +56,14 @@ class QuestionService {
       throw new Error(err);
     }
   };
+
+  getRandomQuestionByCategory = async (category_id) => {
+    try {
+      return await questionDB.getRandomQuestionByCategory(category_id);
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
 }
 
 export default new QuestionService();

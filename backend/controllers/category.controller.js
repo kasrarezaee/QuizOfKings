@@ -28,6 +28,11 @@ class CategoryController {
     const result = await categoryService.deleteCategory(id);
     res.status(200).json(result);
   };
+
+  getRandomCategories = async (req, res) => {
+    result = await categoryService.getRandomCategories()
+    res.status(200).json(result)
+  }
 }
 
 export default new CategoryController();
