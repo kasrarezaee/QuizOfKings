@@ -15,6 +15,8 @@ class UserDB {
                     , registration_date , is_blocked , xp_level`,
       [username, email, password_hash]
     );
+    //create role for user...(by default regular)
+
     return rows;
   };
 

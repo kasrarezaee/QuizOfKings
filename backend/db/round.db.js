@@ -5,30 +5,10 @@ import questionDb from "./question.db"
 const { query, closeConnection } = db
 
 class RoundDB {
-    createRound = async (session_id, category_id, round_questions) => {
-        const { roundNumber } = await query(`SELECT round_number FROM rounds r 
-                                            JOIN session s on s.session_id = r.session_id 
-                                            WHERE session_id = $1` , [session_id])
-        let newRoundNumber = 0;
-        if (roundNumber == null) {
-            newRoundNumber = 1
-        } else if (roundNumber == null) {
-            const { round_id } = await query(`SELECT round_id FROM rounds r 
-                                            JOIN session s on s.session_id = r.session_id 
-                                            WHERE session_id = $1 ` , [session_id])
 
-            if (!this.isRoundComplete(round_id, roundNumber)) {
-                newRoundNumber = roundNumber + 1;
-            }
-        }
-        const { player1_id, player2_id } = await query(`SELECT player1_id , player2_id FROM sessions
-                                                        WHERE session_id = $1` , [session_id])
-        let turn = 0;
-        if (newRoundNumber % 2 == 1) {
-            turn = player1_id
-        } else {
-            turn = player2_id
-        }
+    createRound = async (session_id, category_id, round_questions) => {
+        let newRoundNumber = this.getRoundNumber(session_id)
+
         const { roundCreated } = await query(`INSERT INTO rounds(session_id , category_played , round_number) VALUES ($1 , $2 , $3) 
                                         RETURNING *`
             , [session_id, category_id, newRoundNumber])
@@ -47,6 +27,39 @@ class RoundDB {
         return { result, turn };
     }
 
+    getTurn = async (session_id) => {
+        const { player1_id, player2_id } = await query(`SELECT player1_id , player2_id FROM sessions
+            WHERE session_id = $1` , [session_id])
+        let roundNumber = this.getRoundNumber(session_id)
+        let turn = 0;
+        if (roundNumber % 2 == 1) {
+            turn = player1_id
+        } else {
+            turn = player2_id
+        }
+        return turn
+    }
+
+    getRoundNumber = async (session_id) => {
+        const { roundNumber } = await query(`SELECT MAX(round_number) FROM rounds r 
+                                            JOIN session s on s.session_id = r.session_id 
+                                            WHERE session_id = $1` , [session_id])
+
+
+        let newRoundNumber = 0;
+        if (roundNumber == null) {
+            newRoundNumber = 1
+        } else if (roundNumber != null) {
+            const { round_id } = await query(`SELECT round_id FROM rounds r 
+                                            JOIN session s on s.session_id = r.session_id 
+                                            WHERE session_id = $1 ` , [session_id])
+
+            if (!this.isRoundComplete(round_id, roundNumber)) {
+                newRoundNumber = roundNumber + 1;
+            }
+        }
+        return newRoundNumber
+    }
     isRoundComplete = async (round_id, round_number) => {
         const { rows } = await query(`
           SELECT COUNT(*) AS answered_count
