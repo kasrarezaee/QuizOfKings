@@ -29,7 +29,7 @@ class UserDB {
 
   getUserByUserName = async (username) => {
     const { rows } = await query(`SELECT * FROM users WHERE username = $1`, [
-      username,
+      username
     ]);
     return rows;
   };

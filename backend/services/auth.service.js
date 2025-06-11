@@ -1,11 +1,12 @@
 import crypto from "crypto"
 import jwt from "jsonwebtoken"
 import userDb from "../db/user.db.js"
-import moment, { min } from "moment"
 import validateUser from "../utils/validateUser.js"
 import hashPassword from "../utils/hashPassword.js"
+import bcrypt from "bcryptjs"
+import dotenv from "dotenv"
+dotenv.config()
 
-const currentDate = moment().format()
 class AuthService {
     signUp = async (user) => {
         try {
@@ -17,31 +18,25 @@ class AuthService {
                 const hashedPassword = await hashPassword.hashPassword(password)
                 const userByEmail = await userDb.getUserByEmail(email)
                 const userByUserName = await userDb.getUserByUserName(username)
-
-                if (userByUserName) {
+                if (userByUserName.length > 0) {
                     throw new Error("username taken already")
                 }
-                if (userByEmail) {
+                if (userByEmail.length > 0) {
                     throw new Error("email taken already")
                 }
 
-                const newUser = await userDb.createUser({
-                    ...user,
-                    password: hashedPassword
-                })
-
-                const userRoles = await userDb.getUserRoles(newUser.user_id)
-
+                const newUser = await userDb.createUser(user.username, user.email, hashedPassword)
+                const userRoles = await userDb.getUserRoles(newUser[0].user_id)
+                console.log(newUser[0].user_id)
                 const token = await this.signToken({
-                    id: newUser.user_id,
-                    roles: userRoles,
+                    id: newUser[0].user_id,
+                    roles: userRoles
                 })
 
                 const refreshToken = await this.signRefreshToken({
-                    id: newUser.user_id,
-                    roles: userRoles,
+                    id: newUser[0].user_id,
+                    roles: userRoles
                 })
-
                 return {
                     token,
                     refreshToken,
@@ -59,14 +54,14 @@ class AuthService {
     login = async (email, password) => {
         try {
             if (validateUser(email, password)) {
-                const userByEmail = await userDb.getUserByEmail(email)
-                if (!user) {
+                const user = await userDb.getUserByEmail(email)//error occur here
+
+                if (user.length == 0) {
                     throw new Error("email is incorrect")
                 }
 
-                const { passwrod_hash, user_id, username, email } = user
-                const isPasswordCorrect = hashPassword.comparePassword(password, passwrod_hash)
-
+                const { password_hash, user_id, username, email: user_email } = user[0]
+                const isPasswordCorrect = await hashPassword.comparePassword(password, password_hash)
                 if (!isPasswordCorrect) {
                     throw new Error("password is incorrect")
                 }
@@ -75,12 +70,12 @@ class AuthService {
 
                 const token = await this.signToken({
                     id: user_id,
-                    roles: userRoles,
+                    roles: userRoles
                 })
 
                 const refreshToken = await this.signRefreshToken({
                     id: user_id,
-                    roles: userRoles,
+                    roles: userRoles
                 })
 
                 return {
@@ -99,10 +94,12 @@ class AuthService {
 
     generateRefreshToken = async (data) => {
         const payload = await this.verifyRefreshToken(data)
-
-        const token = jwt.sign(payload, process.env.SECRET, { expiresIn: "60s" })
-        const refreshToken = jwt.sign(payload, process.env.SECRET, { expiresIn: "15m" })
-
+        console.log(payload.id)
+        //const token = jwt.sign(payload, process.env.SECRET, { expiresIn: "60s" })
+        //const refreshToken = jwt.sign(payload, process.env.SECRET, { expiresIn: "15m" })
+        const token = await this.signToken({ id: payload.id, roles: payload.roles })
+        const refreshToken = await this.signRefreshToken({ id: payload.id, roles: payload.roles })
+        console.log(token + "  service  " + refreshToken)
         return {
             token,
             refreshToken
@@ -121,9 +118,10 @@ class AuthService {
 
     signToken = async (data) => {
         try {
-            return jwt.sign(data, process.env.SECRET, { expiresIn: "60s" })
+            return jwt.sign(data, process.env.SECRET, { expiresIn: "600s" })
         } catch (err) {
-            throw new Error("an error occured")
+            console.log(process.env.SECRET)
+            throw new Error(err + "an error occured")
         }
     }
 
@@ -135,3 +133,5 @@ class AuthService {
         }
     }
 }
+
+export default new AuthService()
