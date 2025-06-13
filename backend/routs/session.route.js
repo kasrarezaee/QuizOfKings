@@ -4,9 +4,14 @@ import express from "express"
 const router = express.Router()
 
 router.route("/")
-    .get(sessionController.getAllSessions)
-    .post(sessionController.createSession)
-    .delete(sessionController.deleteAllSessions)
+    .get(sessionController.getSessions)
 
-router.route("/:id")
+router.route("/session/:id")
     .get(sessionController.getSession)
+    .delete(sessionController.deleteSession)
+
+router.route("/user/:id")
+    .get(sessionController.getSessionsByUserID)
+    .post(sessionController.createSession)
+
+export default router

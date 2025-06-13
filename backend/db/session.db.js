@@ -5,10 +5,11 @@ const { query, closeConnection } = db
 class SessionDB {
 
     createSession = async (player1_id) => {
-        const { random_user } = await query(`SELECT * FROM users ORDER BY RAND() LIMIT 1`)
-        const { sessionCreated } = await query(`INSERT INTO sessions (player1_id , player2_id) 
-                                        VALUES($1 , $2) RETURNING *`
-            , [player1_id, parseInt(random_user[0])])
+        const { rows } = await query(`SELECT * FROM users ORDER BY RANDOM() LIMIT 1`)
+
+        const { rows: sessionCreated } = await query(`INSERT INTO sessions (player1_id , player2_id) 
+                                       VALUES($1 , $2) RETURNING *`
+            , [player1_id, parseInt(rows[0].user_id)])
 
         const result = sessionCreated
         return result;
@@ -35,5 +36,28 @@ class SessionDB {
         return false;
     };
 
+    getSession = async (session_id) => {
+        const { rows } = await query(`SELECT * FROM sessions WHERE session_id = $1`, [session_id])
+        return rows
+    }
+
+    getSessionsByUserID = async (user_id) => {
+        const { rows } = await query(`SELECT * FROM sessions 
+                                    WHERE player1_id = $1 OR player2_id = $2`
+            , [user_id, user_id])
+        return rows
+    }
+
+    getSessions = async () => {
+        const { rows } = await query(`SELECT * FROM sessions`)
+        return rows
+    }
+
+    deleteSession = async (session_id) => {
+        const { rows } = await query(`DELETE FROM sessions WHERE session_id = $1`, [session_id])
+        return rows
+    }
 
 }
+
+export default new SessionDB()
