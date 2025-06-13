@@ -118,9 +118,9 @@ class QuestionDB {
     return rows;
   };
 
-  getRandomQuestionByCategory = async (category_id)=>{
-    const{rows} = query(`SELECT * FROM questions ORDER BY RAND() LIMIT 3 WHERE category_id = $1` 
-                        , [category_id])
+  getRandomQuestionByCategory = async (category_id) => {
+    const { rows } = await query(`SELECT * FROM questions WHERE category_id = $1 ORDER BY RANDOM() LIMIT 3`
+      , [category_id])
 
     return rows;
   }

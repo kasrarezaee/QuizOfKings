@@ -37,7 +37,8 @@ class SessionDB {
     };
 
     getSession = async (session_id) => {
-        const { rows } = await query(`SELECT * FROM sessions WHERE session_id = $1`, [session_id])
+        const { rows } = await query(`SELECT * FROM sessions s JOIN rounds r 
+                                    ON s.session_id = r.session_id  WHERE s.session_id = $1`, [session_id])
         return rows
     }
 

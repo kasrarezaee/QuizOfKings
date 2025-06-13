@@ -1,7 +1,8 @@
 create session
-create round
+get Turn 
 get random category
 select a category -> get three random question
+create round
 submit answer 
 end round
 get turn 
