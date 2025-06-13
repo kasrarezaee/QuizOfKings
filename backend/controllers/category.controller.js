@@ -30,7 +30,7 @@ class CategoryController {
   };
 
   getRandomCategories = async (req, res) => {
-    result = await categoryService.getRandomCategories()
+    const result = await categoryService.getRandomCategories()
     res.status(200).json(result)
   }
 }

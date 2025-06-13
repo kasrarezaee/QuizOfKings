@@ -7,6 +7,7 @@ const { query, closeConnection } = db
 class RoundDB {
 
     createRound = async (session_id, category_id, round_questions) => {
+
         let newRoundNumber = this.getRoundNumber(session_id)
 
         const { roundCreated } = await query(`INSERT INTO rounds(session_id , category_played , round_number) VALUES ($1 , $2 , $3) 
@@ -83,7 +84,7 @@ class RoundDB {
                                         FROM sessions WHERE session_id = $1` , [session_id]);
 
         let result = {}
-        if (user_id == users.player1_id) {
+        if (user_id == users[0].player1_id) {
             result = await query(`UPDATE round_questions SET player1_answer = $1 
                                 WHERE round_id =$2 and question_id = $3 RETURNING *`
                 , [answer, round_id, question_id])
@@ -92,6 +93,7 @@ class RoundDB {
                                 WHERE round_id =$2 and question_id = $3 RETURNING *`
                 , [answer, round_id, question_id])
         }
+        //send the correct answer to frontend.
         return result;
     }
 

@@ -1,0 +1,29 @@
+create session
+create round
+get random category
+select a category -> get three random question
+submit answer 
+end round
+get turn 
+based on whose turn -> create round and select category
+
+
+...
+sessions
+get sessions (for admin all , for user his)
+get session
+create session
+delete session (for admin)
+
+rounds 
+create round 
+get rounds (for admin all , for user his)
+get round 
+delete round (for admin)
+
+turn 
+get turn 
+
+random 
+get random category
+get random question

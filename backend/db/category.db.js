@@ -39,7 +39,7 @@ class CategoryDB {
   };
 
   getRandomCategories = async () => {
-    const { rows } = await query(`SELECT * FROM categories ORDER BY RAND() LIMIT 3`)
+    const { rows } = await query(`SELECT * FROM categories ORDER BY RANDOM() LIMIT 3`)
     return rows;
   }
 }

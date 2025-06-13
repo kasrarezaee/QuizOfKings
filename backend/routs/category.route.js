@@ -14,6 +14,6 @@ router
   .get(categoryController.getCategory)
   .delete(categoryController.deleteCategory);
 
-router.route("/random").get(categoryController.getRandomCategories)
+router.route("/random/random").get(categoryController.getRandomCategories)
 
 export default router;

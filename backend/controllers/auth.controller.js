@@ -7,7 +7,7 @@ class AuthController {
         res.header("auth-token", token)
         res.cookie("refresh-token", refreshToken, {
             httpOnly: true,
-            secure: false,
+            secure: true,
             sameSite: "Strict"
         })
         res.status(200).json({

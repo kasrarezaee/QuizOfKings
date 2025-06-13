@@ -105,6 +105,7 @@ class AuthService {
             refreshToken
         }
     }
+
     verifyRefreshToken = async (data) => {
         try {
             const payload = jwt.verify(data, process.env.SECRET)
@@ -118,7 +119,7 @@ class AuthService {
 
     signToken = async (data) => {
         try {
-            return jwt.sign(data, process.env.SECRET, { expiresIn: "600s" })
+            return jwt.sign(data, process.env.SECRET, { expiresIn: "60s" })
         } catch (err) {
             console.log(process.env.SECRET)
             throw new Error(err + "an error occured")
