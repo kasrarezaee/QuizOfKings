@@ -119,7 +119,6 @@ BEGIN
     UPDATE player_stats
     SET total_games = total_games + 1
     WHERE user_id IN (NEW.player1_id, NEW.player2_id);
-
     -- Increase games won for the winner
     IF NEW.winner_id IS NOT NULL THEN
       UPDATE player_stats

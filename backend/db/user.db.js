@@ -11,12 +11,12 @@ class UserDB {
       `INSERT INTO users(username , email , password_hash) 
                     VALUES ($1 , $2 , $3)
                     RETURNING 
-                    user_id , username , email , password_hash 
-                    , registration_date , is_blocked , xp_level`,
+                    *`,
       [username, email, password_hash]
     );
     //create role for user...(by default regular)
-
+    console.log(rows)
+    await query(`INSERT INTO player_stats(user_id) VALUES ($1)`, [rows[0].user_id])
     return rows;
   };
 
@@ -86,6 +86,7 @@ class UserDB {
                                     VALUES ($1 , $2) RETURNING *`,
       [user_id, role_id]
     );
+
     return rows;
   };
 
