@@ -19,8 +19,7 @@ class AuthController {
 
     login = async (req, res) => {
         const { email, password } = req.body
-        const { token, refreshToken, user } = await authService.login(email, password)
-
+        const { userRoles, token, refreshToken, user } = await authService.login(email, password)
         res.header("auth-token", token)
         res.cookie("refresh-token", refreshToken, {
             httpOnly: true,
@@ -30,19 +29,17 @@ class AuthController {
 
         res.status(200).json({
             token,
-            user
+            user,
         })
 
     }
 
     refresh_token = async (req, res) => {
-
-        if (!req.body.refreshToken) {
+        if (!req.cookies.refreshToken) {
             throw new Error("token is missing")
         }
 
-        const { token, refreshToken } = await authService.generateRefreshToken(req.body.refreshToken)
-        console.log(token + "----" + refreshToken)
+        const { token, refreshToken } = await authService.generateRefreshToken(req.cookies.refreshToken)
         res.header("auth-token", token)
         res.cookie("refresh-token", refreshToken, {
             httpOnly: true,

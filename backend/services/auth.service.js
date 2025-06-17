@@ -94,12 +94,10 @@ class AuthService {
 
     generateRefreshToken = async (data) => {
         const payload = await this.verifyRefreshToken(data)
-        console.log(payload.id)
         //const token = jwt.sign(payload, process.env.SECRET, { expiresIn: "60s" })
         //const refreshToken = jwt.sign(payload, process.env.SECRET, { expiresIn: "15m" })
         const token = await this.signToken({ id: payload.id, roles: payload.roles })
         const refreshToken = await this.signRefreshToken({ id: payload.id, roles: payload.roles })
-        console.log(token + "  service  " + refreshToken)
         return {
             token,
             refreshToken
@@ -119,7 +117,7 @@ class AuthService {
 
     signToken = async (data) => {
         try {
-            return jwt.sign(data, process.env.SECRET, { expiresIn: "60s" })
+            return jwt.sign(data, process.env.SECRET, { expiresIn: "120s" })
         } catch (err) {
             console.log(process.env.SECRET)
             throw new Error(err + "an error occured")

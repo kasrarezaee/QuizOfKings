@@ -6,10 +6,11 @@ import questionRouter from "./routs/question.route.js";
 import authRouter from "./routs/auth.route.js"
 import sessionRouter from "./routs/session.route.js"
 import roundRoute from "./routs/round.route.js"
+import cookieParser from "cookie-parser";
 
 const app = express();
 app.use(express.json());
-
+app.use(cookieParser())
 app.use("/api/users", userRouter);
 app.use("/api/role", roleRouter);
 app.use("/api/category", categoryRouter);
