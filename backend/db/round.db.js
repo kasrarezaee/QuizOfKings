@@ -48,26 +48,26 @@ class RoundDB {
                 WHERE rq.player2_answer = q.correct_answer`)
 
 
-        const player1_id = player1_answers[0].player1_id
-        const player2_id = player2_answers[0].player2_id
+        const player1_id = player_answers[0].player1_id
+        const player2_id = player_answers[0].player2_id
         const player1_correct_answers = player1_answers.length
         const player2_correct_answers = player2_answers.length
 
         if (this.isRoundComplete(player_answers)) {
             if (player1_correct_answers > player2_correct_answers) {
-                await query(`UPDATE rounds SET winner_id = $1 , round_status = COMPLETED 
+                await query(`UPDATE rounds SET winner_id = $1 , round_status = 'COMPLETED' 
                                 WHERE session_id = $2 and round_number = $3`
                     , [player1_id, session_id, round_number])
 
 
             } else if (player1_correct_answers < player2_correct_answers) {
-                await query(`UPDATE rounds SET winner_id = $1 , round_status = COMPLETED
+                await query(`UPDATE rounds SET winner_id = $1 , round_status = 'COMPLETED'
                                 WHERE session_id = $2 and round_number = $3`
                     , [player2_id, session_id, round_number])
 
             }
             else {
-                await query(`UPDATE rounds SET winner_id = $1 , round_status = COMPLETED
+                await query(`UPDATE rounds SET winner_id = $1 , round_status = 'COMPLETED'
                                 WHERE session_id = $2 and round_number = $3`
                     , [null, session_id, round_number])
             }

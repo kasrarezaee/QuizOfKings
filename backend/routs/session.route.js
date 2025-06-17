@@ -6,7 +6,7 @@ const router = express.Router()
 router.route("/")
     .get(sessionController.getSessions)
 
-router.route("/:id")
+router.route("/finish/:id")
     .post(sessionController.finishSession)
 
 router.route("/session/:id")

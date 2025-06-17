@@ -24,12 +24,11 @@ class SessionDB {
         const player1_id = rounds[0].player1_id
         const player2_id = rounds[0].player2_id
         let game_result = 0;
-        for (let round in rounds) {
+        for (let round of rounds) {
             if (round.round_status == 'ACTIVE') {
                 return -1;
-                break
             }
-
+            console.log(round.winner_id)
             if (round.winner_id == player1_id) {
                 game_result++
             } else if (round.winner_id == player2_id) {
@@ -40,11 +39,11 @@ class SessionDB {
         }
 
         if (game_result == 0) {
-            await query(`UPDATE sessions SET session_status = COMPLETED , winner_id = $1 WHERE session_id = $2`, [null, session_id])
+            await query(`UPDATE sessions SET session_status = 'COMPLETED' , winner_id = $1 , end_time = NOW() WHERE session_id = $2`, [null, session_id])
         } else if (game_result > 0) {
-            await query(`UPDATE sessions SET session_status = COMPLETED , winner_id = $1 WHERE session_id = $2`, [player1_id, session_id])
+            await query(`UPDATE sessions SET session_status = 'COMPLETED' , winner_id = $1 , end_time = NOW() WHERE session_id = $2`, [player1_id, session_id])
         } else {
-            await query(`UPDATE sessions SET session_status = COMPLETED , winner_id = $1 WHERE session_id = $2`, [player2_id, session_id])
+            await query(`UPDATE sessions SET session_status = 'COMPLETED' , winner_id = $1 , end_time = NOW() WHERE session_id = $2`, [player2_id, session_id])
         }
         return game_result
     }
