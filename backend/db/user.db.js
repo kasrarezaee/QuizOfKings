@@ -79,6 +79,8 @@ class UserDB {
   };
 
   assignRole = async (user_id, role_id) => {
+    console.log(user_id + role_id);
+    console.log("userDB")
     const { rows } = await query(
       `INSERT INTO user_roles(user_id , role_id) 
                                     VALUES ($1 , $2) RETURNING *`,

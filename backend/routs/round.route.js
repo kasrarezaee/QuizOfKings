@@ -1,7 +1,11 @@
 import roundController from "../controllers/round.controller.js";
 import express from "express"
+import verifyToken from "../middlewares/verifyToken.js";
+import allowRoles from "../middlewares/allowRoles.js";
 
 const router = express.Router()
+
+router.use(verifyToken)
 
 router.route("/")
     .post(roundController.createRound)
@@ -11,7 +15,7 @@ router.route("/turn/session_id/:session_id")
 
 router.route("/round_id/:round_id")
     .get(roundController.getRound)
-    .delete(roundController.deleteRound)
+    .delete(allowRoles("admin"), roundController.deleteRound)
 
 router.route("/session_id/:session_id")
     .get(roundController.getRound)

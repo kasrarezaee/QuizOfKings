@@ -1,7 +1,12 @@
 import express from "express";
 import roleController from "../controllers/role.controller.js";
+import verifyToken from "../middlewares/verifyToken.js";
+import allowRoles from "../middlewares/allowRoles.js";
 
 const router = express.Router();
+
+router.use(verifyToken)
+router.use(allowRoles("admin"))
 
 router
   .route("/")

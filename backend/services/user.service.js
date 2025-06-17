@@ -80,6 +80,7 @@ class UserService {
     }
 
     assignRole = async (user_id, role_id) => {
+        console.log("userService")
         try {
             return await userDb.assignRole(user_id, role_id);
         } catch (err) {
