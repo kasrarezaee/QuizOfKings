@@ -40,6 +40,14 @@ class SessionService {
             throw new Error(err)
         }
     }
+
+    finishSession = async (session_id) => {
+        try {
+            return await sessionDB.finishSession(session_id)
+        } catch (err) {
+            throw new Error(err)
+        }
+    }
 }
 
 export default new SessionService()

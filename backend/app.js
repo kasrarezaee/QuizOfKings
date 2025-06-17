@@ -11,8 +11,8 @@ const app = express();
 app.use(express.json());
 
 app.use("/api/users", userRouter);
-app.use("/api/admin/role", roleRouter);
-app.use("/api/admin/category", categoryRouter);
+app.use("/api/role", roleRouter);
+app.use("/api/category", categoryRouter);
 app.use("/api/question", questionRouter);
 app.use("/api/auth", authRouter)
 app.use("/api/session", sessionRouter)

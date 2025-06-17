@@ -9,6 +9,7 @@ class RoundDB {
     createRound = async (session_id, category_id, round_questions) => {
 
         let newRoundNumber = await this.getRoundNumber(session_id)
+
         const { rows: roundCreated } = await query(`INSERT INTO rounds(session_id , category_played , round_number) VALUES ($1 , $2 , $3) 
                                         RETURNING *`
             , [session_id, category_id, newRoundNumber])
@@ -27,11 +28,63 @@ class RoundDB {
         return result;
     }
 
+    questionCorrection = async (round_number, session_id) => {
+        //for (let i = round_number; i > 0; i--) {
+        const { rows: player_answers } = await query(`SELECT * FROM sessions s 
+                JOIN rounds r ON r.session_id = s.session_id
+                JOIN round_questions rq ON rq.round_id = r.round_id
+                JOIN questions q ON q.question_id = rq.question_id `);
+
+        const { rows: player1_answers } = await query(`SELECT * FROM sessions s 
+                JOIN rounds r ON r.session_id = s.session_id
+                JOIN round_questions rq ON rq.round_id = r.round_id
+                JOIN questions q ON q.question_id = rq.question_id 
+                WHERE rq.player1_answer = q.correct_answer`);
+
+        const { rows: player2_answers } = await query(`SELECT * FROM sessions s 
+                JOIN rounds r ON r.session_id = s.session_id
+                JOIN round_questions rq ON rq.round_id = r.round_id
+                JOIN questions q ON q.question_id = rq.question_id 
+                WHERE rq.player2_answer = q.correct_answer`)
+
+
+        const player1_id = player1_answers[0].player1_id
+        const player2_id = player2_answers[0].player2_id
+        const player1_correct_answers = player1_answers.length
+        const player2_correct_answers = player2_answers.length
+
+        if (this.isRoundComplete(player_answers)) {
+            if (player1_correct_answers > player2_correct_answers) {
+                await query(`UPDATE rounds SET winner_id = $1 , round_status = COMPLETED 
+                                WHERE session_id = $2 and round_number = $3`
+                    , [player1_id, session_id, round_number])
+
+
+            } else if (player1_correct_answers < player2_correct_answers) {
+                await query(`UPDATE rounds SET winner_id = $1 , round_status = COMPLETED
+                                WHERE session_id = $2 and round_number = $3`
+                    , [player2_id, session_id, round_number])
+
+            }
+            else {
+                await query(`UPDATE rounds SET winner_id = $1 , round_status = COMPLETED
+                                WHERE session_id = $2 and round_number = $3`
+                    , [null, session_id, round_number])
+            }
+        }
+        //}
+    }
+
     getTurn = async (session_id) => {
         const { rows } = await query(`SELECT * FROM sessions
             WHERE session_id = $1` , [session_id])
 
         let roundNumber = await this.getRoundNumber(session_id)
+
+        if (roundNumber != 1) {
+            this.questionCorrection(roundNumber - 1, session_id)
+        }
+
         let turn = 0;
         if (roundNumber % 2 == 1) {
             turn = rows[0].player1_id
@@ -48,14 +101,12 @@ class RoundDB {
                                             WHERE s.session_id = $1` , [session_id])
 
 
-        console.log(roundNumber[0].max)
         let newRoundNumber = 0;
         if (roundNumber[0].max === null) {
-            console.log("here")
             newRoundNumber = 1
         } else if (roundNumber[0].max != null) {
-            const { rows } = await query(`SELECT MAX(round_id) FROM rounds  
-                                            WHERE session_id = $1 ` , [session_id])
+            //const { rows } = await query(`SELECT MAX(round_id) FROM rounds  
+            //                                WHERE session_id = $1 ` , [session_id])
 
 
             //if (!this.isRoundComplete(rows[0].max, roundNumber[0].max)) {
@@ -64,22 +115,13 @@ class RoundDB {
         }
         return newRoundNumber
     }
-    isRoundComplete = async (round_id, round_number) => {
-        console.log(round_id, round_number + "test")
-        const { rows } = await query(`
-          SELECT COUNT(*) AS answered_count
-          FROM rounds r
-          JOIN round_questions rq ON rq.round_id = r.round_id
-          WHERE r.round_id = $1 AND r.round_number=$2
-            AND rq.player1_answer IS NOT NULL
-            AND rq.player2_answer IS NOT NULL
-        `, [round_id, round_number]);
-
-        const answeredCount = rows[0].answered_count;
-        if (answeredCount == 3) {
-            return true;
+    isRoundComplete = async (player_answers) => {
+        for (let i in player_answers) {
+            if (i.player1_answer == null || i.player2_answer == null) {
+                return false
+            }
         }
-        return false;
+        return true
     };
 
     submitAnswer = async ({ session_id, round_id, question_id, user_id, answer }) => {

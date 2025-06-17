@@ -30,6 +30,12 @@ class SessionController {
         const result = await sessionService.deleteSession(id)
         res.status(200).json(result)
     }
+
+    finishSession = async (req, res) => {
+        const { id } = req.params
+        const result = await sessionService.finishSession(id)
+        res.status(200).json(result)
+    }
 }
 
 export default new SessionController()

@@ -28,3 +28,25 @@ get turn
 random 
 get random category
 get random question
+
+
+
+--------scenario
+/api/session/user/user_id
+/api/round/turn/session_id/session_id
+/api/category/random/random
+/api/question/radnom/category_id
+/api/round/
+    {
+        "session_id"
+        "category_id"
+        "round_questions"
+    }
+/api/round/submit
+    {
+        "session_id"
+        "round_id"
+        "question_id"
+        "user_id"
+        "answer"
+    }

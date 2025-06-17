@@ -15,6 +15,40 @@ class SessionDB {
         return result;
     }
 
+    finishSession = async (session_id) => {
+        const { rows: rounds } = await query(`SELECT * FROM sessions s 
+                                            JOIN rounds r ON r.session_id = s.session_id
+                                            WHERE s.session_id = $1`
+            , [session_id])
+
+        const player1_id = rounds[0].player1_id
+        const player2_id = rounds[0].player2_id
+        let game_result = 0;
+        for (let round in rounds) {
+            if (round.round_status == 'ACTIVE') {
+                return -1;
+                break
+            }
+
+            if (round.winner_id == player1_id) {
+                game_result++
+            } else if (round.winner_id == player2_id) {
+                game_result--
+            } else {
+                continue
+            }
+        }
+
+        if (game_result == 0) {
+            await query(`UPDATE sessions SET session_status = COMPLETED , winner_id = $1 WHERE session_id = $2`, [null, session_id])
+        } else if (game_result > 0) {
+            await query(`UPDATE sessions SET session_status = COMPLETED , winner_id = $1 WHERE session_id = $2`, [player1_id, session_id])
+        } else {
+            await query(`UPDATE sessions SET session_status = COMPLETED , winner_id = $1 WHERE session_id = $2`, [player2_id, session_id])
+        }
+        return game_result
+    }
+
     isSessionComplete = async (session_id) => {
         // Count total answered round_questions for the session
         const { rows } = await query(`
