@@ -17,8 +17,8 @@ router.route("/round_id/:round_id")
     .get(roundController.getRound)
     .delete(allowRoles("admin"), roundController.deleteRound)
 
-router.route("/session_id/:session_id")
-    .get(roundController.getRound)
+//router.route("/session_id/:session_id")
+//    .get(roundController.getRound)
 
 router.route("/submit")
     .post(roundController.submitAnswer)

@@ -81,7 +81,8 @@ class AuthService {
                 return {
                     token,
                     refreshToken,
-                    user
+                    user,
+                    userRoles
                 }
 
             } else {

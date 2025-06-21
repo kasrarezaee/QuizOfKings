@@ -7,11 +7,24 @@ class SessionDB {
     createSession = async (player1_id) => {
         const { rows } = await query(`SELECT * FROM users ORDER BY RANDOM() LIMIT 1`)
 
-        const { rows: sessionCreated } = await query(`INSERT INTO sessions (player1_id , player2_id) 
-                                       VALUES($1 , $2) RETURNING *`
+        await query(`INSERT INTO sessions (player1_id , player2_id) 
+                                       VALUES($1 , $2)`
             , [player1_id, parseInt(rows[0].user_id)])
 
+
+        const { rows: sessionCreated } = await query(`
+                SELECT s.session_id , us.username , us.email 
+                FROM sessions s  
+                JOIN users u ON u.user_id = s.player1_id
+                JOIN users us ON us.user_id = s.player2_id
+                WHERE s.player1_id = $1 AND s.player2_id = $2
+                ORDER BY s.session_id DESC
+                LIMIT 1
+              `, [player1_id, parseInt(rows[0].user_id)]);
+
+
         const result = sessionCreated
+
         return result;
     }
 
@@ -70,8 +83,10 @@ class SessionDB {
     };
 
     getSession = async (session_id) => {
-        const { rows } = await query(`SELECT * FROM sessions s JOIN rounds r 
-                                    ON s.session_id = r.session_id  WHERE s.session_id = $1`, [session_id])
+        const { rows } = await query(`SELECT * FROM sessions s 
+                                    JOIN rounds r ON s.session_id = r.session_id  
+                                    WHERE s.session_id = $1`, [session_id])
+
         return rows
     }
 

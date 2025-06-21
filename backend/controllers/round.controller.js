@@ -18,9 +18,9 @@ class RoundController {
         res.status(200).json(result)
     }
 
-    getRound = async (rea, res) => {
-        const { id } = req.params
-        const result = await roundService.getRound(id)
+    getRound = async (req, res) => {
+        const { round_id } = req.params
+        const result = await roundService.getRound(round_id)
         res.status(200).json(result)
     }
 

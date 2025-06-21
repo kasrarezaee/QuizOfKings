@@ -10,9 +10,9 @@ class RoundDB {
 
         let newRoundNumber = await this.getRoundNumber(session_id)
 
-        const { rows: roundCreated } = await query(`INSERT INTO rounds(session_id , category_played , round_number) VALUES ($1 , $2 , $3) 
+        const { rows: roundCreated } = await query(`INSERT INTO rounds(session_id , category_played , round_number , round_status) VALUES ($1 , $2 , $3 , $4) 
                                         RETURNING *`
-            , [session_id, category_id, newRoundNumber])
+            , [session_id, category_id, newRoundNumber, 'ACTIVE'])
 
         await query(`INSERT INTO round_questions(round_id , question_id) VALUES
                     ($1 , $2) , ($3 , $4) , ($5 , $6)`
@@ -24,6 +24,11 @@ class RoundDB {
                 , round_questions[2].question_id
             ]
         )
+        //const { rows: result } = await query(`SELECT * FROM rounds r 
+        //                                            JOIN round_questions rq ON r.round_id = rq.round_id
+        //                                            JOIN questions q ON rq.question_id = q.question_id
+        //                                            WHERE r.round_id=$1`
+        //    , [roundCreated[0].round_id])
         const result = roundCreated
         return result;
     }
@@ -33,19 +38,25 @@ class RoundDB {
         const { rows: player_answers } = await query(`SELECT * FROM sessions s 
                 JOIN rounds r ON r.session_id = s.session_id
                 JOIN round_questions rq ON rq.round_id = r.round_id
-                JOIN questions q ON q.question_id = rq.question_id `);
+                JOIN questions q ON q.question_id = rq.question_id 
+                WHERE s.session_id = $1 AND r.round_number = $2`
+            , [session_id, round_number]);
 
         const { rows: player1_answers } = await query(`SELECT * FROM sessions s 
                 JOIN rounds r ON r.session_id = s.session_id
                 JOIN round_questions rq ON rq.round_id = r.round_id
                 JOIN questions q ON q.question_id = rq.question_id 
-                WHERE rq.player1_answer = q.correct_answer`);
+                WHERE rq.player1_answer = q.correct_answer
+                AND s.session_id = $1 AND r.round_number = $2`
+            , [session_id, round_number]);
 
         const { rows: player2_answers } = await query(`SELECT * FROM sessions s 
                 JOIN rounds r ON r.session_id = s.session_id
                 JOIN round_questions rq ON rq.round_id = r.round_id
                 JOIN questions q ON q.question_id = rq.question_id 
-                WHERE rq.player2_answer = q.correct_answer`)
+                WHERE rq.player2_answer = q.correct_answer
+                AND s.session_id = $1 AND r.round_number = $2`
+            , [session_id, round_number])
 
 
         const player1_id = player_answers[0].player1_id
@@ -53,7 +64,8 @@ class RoundDB {
         const player1_correct_answers = player1_answers.length
         const player2_correct_answers = player2_answers.length
 
-        if (this.isRoundComplete(player_answers)) {
+        if (await this.isRoundComplete(player_answers)) {
+
             if (player1_correct_answers > player2_correct_answers) {
                 await query(`UPDATE rounds SET winner_id = $1 , round_status = 'COMPLETED' 
                                 WHERE session_id = $2 and round_number = $3`
@@ -116,8 +128,11 @@ class RoundDB {
         return newRoundNumber
     }
     isRoundComplete = async (player_answers) => {
-        for (let i in player_answers) {
-            if (i.player1_answer == null || i.player2_answer == null) {
+
+        for (let i = 0; i < player_answers.length; i++) {
+
+            if (player_answers[i].player1_answer == null || player_answers[i].player2_answer == null) {
+
                 return false
             }
         }
@@ -132,6 +147,7 @@ class RoundDB {
                                              FROM questions WHERE question_id = $1`
             , [question_id])
         let result = {}
+
         if (user_id == users[0].player1_id) {
             result = await query(`UPDATE round_questions SET player1_answer = $1 
                                 WHERE round_id =$2 and question_id = $3 RETURNING *`
@@ -145,10 +161,12 @@ class RoundDB {
     }
 
     getRound = async (round_id) => {
-        const { rows } = await query(`SELECT * FROM rounds r 
+        const { rows } = await query(`SELECT * FROM sessions s 
+                                    JOIN rounds r ON s.session_id = r.session_id 
                                     JOIN round_questions rq ON r.round_id = rq.round_id
-                                    JOIN questions q ON q.quesiton_id = rq.question_id 
+                                    JOIN questions q ON q.question_id = rq.question_id 
                                     WHERE r.round_id = $1` , [round_id])
+
         return rows
     }
 

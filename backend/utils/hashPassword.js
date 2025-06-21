@@ -9,7 +9,6 @@ class HashPassword {
     }
 
     comparePassword = async (password, hashedPassword) => {
-        console.log("comparing" + password + " " + hashedPassword)
         return await bcrypt.compare(password, hashedPassword.trim())
     }
 }

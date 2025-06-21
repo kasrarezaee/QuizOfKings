@@ -26,6 +26,7 @@ class RoundService {
     }
 
     getRound = async (round_id) => {
+
         try {
             return await roundDB.getRound(round_id)
         } catch (err) {

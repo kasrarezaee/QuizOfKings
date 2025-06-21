@@ -6,18 +6,17 @@ import allowRoles from "../middlewares/allowRoles.js";
 const router = express.Router();
 
 router.use(verifyToken)
-router.use(allowRoles("admin"))
 
 router
   .route("/")
-  .get(categoryController.getAllCategories)
-  .delete(categoryController.deleteAllCategories)
-  .post(categoryController.createCategory);
+  .get(allowRoles("admin"), categoryController.getAllCategories)
+  .delete(allowRoles("admin"), categoryController.deleteAllCategories)
+  .post(allowRoles("admin"), categoryController.createCategory);
 
 router
   .route("/:id")
-  .get(categoryController.getCategory)
-  .delete(categoryController.deleteCategory);
+  .get(allowRoles("admin"), categoryController.getCategory)
+  .delete(allowRoles("admin"), categoryController.deleteCategory);
 
 router.route("/random/random").get(categoryController.getRandomCategories)
 

@@ -19,7 +19,7 @@ app.use("/api/auth", authRouter)
 app.use("/api/session", sessionRouter)
 app.use("/api/round", roundRoute)
 app.get("/", async (req, res) => {
-  //res.send("<h1 style='text-align: center'>Hello</h1>")
+  res.send("<h1 style='text-align: center'>Hello</h1>")
 });
 
 export default app;
