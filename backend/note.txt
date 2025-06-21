@@ -50,3 +50,18 @@ get random question
         "user_id"
         "answer"
     }
+
+
+----------------
+we need an admin , so he can grant some role to anyone , block and unblock anyone
+    role assign
+    block
+    unblock
+we need some moderator to reject and accept round_questions -> done
+    update_question
+    insert_moderation_table
+we need some questions_designer to design question -> done
+    create_question
+we need to only get player stats
+    get
+we need to modify moderation table

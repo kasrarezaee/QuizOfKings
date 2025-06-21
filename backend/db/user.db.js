@@ -100,7 +100,7 @@ class UserDB {
 
   getUserRoles = async (user_id) => {
     const { rows } = await query(
-      `SELECT R.role_name FROM users U 
+      `SELECT * FROM users U 
                                     JOIN user_roles UR ON U.user_id = UR.user_id 
                                     JOIN roles R ON UR.role_id = R.role_id
                                     WHERE U.user_id = $1`,

@@ -6,6 +6,7 @@ import questionRouter from "./routs/question.route.js";
 import authRouter from "./routs/auth.route.js"
 import sessionRouter from "./routs/session.route.js"
 import roundRoute from "./routs/round.route.js"
+import moderationRoute from "./routs/moderation.route.js"
 import cookieParser from "cookie-parser";
 
 const app = express();
@@ -18,6 +19,7 @@ app.use("/api/question", questionRouter);
 app.use("/api/auth", authRouter)
 app.use("/api/session", sessionRouter)
 app.use("/api/round", roundRoute)
+app.use("/api/moderation", moderationRoute)
 app.get("/", async (req, res) => {
   res.send("<h1 style='text-align: center'>Hello</h1>")
 });

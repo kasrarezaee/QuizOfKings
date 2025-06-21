@@ -2,12 +2,13 @@ import userController from "../controllers/user.controller.js"
 import verifyToken from "../middlewares/verifyToken.js"
 import express from "express"
 import allowRoles from "../middlewares/allowRoles.js"
+import isBlock from "../middlewares/isBlock.js"
 
 const router = express.Router()
 
 
 router.use(verifyToken)
-
+router.use(isBlock)
 router.route("/").get(allowRoles("admin"), userController.getAllUsers)
     .post(userController.createUser)
 
@@ -27,7 +28,7 @@ router.route("/role/:user_id/:role_id")
     .post(allowRoles("admin"), userController.assignRole)
     .delete(allowRoles("admin"), userController.deleteRole)
 
-router.route("role/:user_id").get(allowRoles("admin"), userController.getUserRoles)
+router.route("/role/:user_id").get(allowRoles("admin"), userController.getUserRoles)
 
 router.route("/username/:username").get(userController.getUserByUserName)
 

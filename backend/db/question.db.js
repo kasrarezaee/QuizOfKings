@@ -96,12 +96,14 @@ class QuestionDB {
       correct_answer,
       category_id,
       difficulty,
+      approval_status,
+      moderator_id
     }
   ) => {
     const { rows } = await query(
       `UPDATE questions SET question_text=$1 , option_a=$2 , option_b=$3 , option_c=$4
-       , option_d=$5 , correct_answer=$6, category_id = $7 , difficulty=$8 
-       WHERE question_id = $9 RETURNING *`,
+       , option_d=$5 , correct_answer=$6, category_id = $7 , difficulty=$8 , approval_status=$9 , moderator_id = $10
+       WHERE question_id = $11 RETURNING *`,
       [
         question_text,
         option_a,
@@ -111,7 +113,9 @@ class QuestionDB {
         correct_answer,
         category_id,
         difficulty,
-        id,
+        approval_status,
+        moderator_id,
+        id
       ]
     );
 
