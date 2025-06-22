@@ -32,5 +32,7 @@ router.route("/role/:user_id").get(allowRoles("admin"), userController.getUserRo
 
 router.route("/username/:username").get(userController.getUserByUserName)
 
+router.route("/player-stats/:id").get(userController.getPlayerStats)
+
 
 export default router

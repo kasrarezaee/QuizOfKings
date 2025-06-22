@@ -117,6 +117,14 @@ class UserService {
         }
     }
 
+    getPlayerStats = async (user_id) => {
+        try {
+            return await userDb.getPlayerStats(user_id)
+        } catch (err) {
+            throw new Error(err)
+        }
+    }
+
 }
 
 export default new UserService()

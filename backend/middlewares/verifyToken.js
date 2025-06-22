@@ -8,6 +8,7 @@ const verifyToken = async (req, res, next) => {
     try {
         const verifiedUser = jwt.verify(token, process.env.SECRET)
         req.user = verifiedUser
+
         next()
     } catch (err) {
         throw new Error("invalid token" + err)

@@ -126,6 +126,8 @@ class QuestionDB {
     const { rows } = await query(`SELECT * FROM questions WHERE category_id = $1 ORDER BY RANDOM() LIMIT 3`
       , [category_id])
 
+    console.log("random ques")
+    console.log(rows)
     return rows;
   }
 }

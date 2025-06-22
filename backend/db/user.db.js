@@ -118,6 +118,14 @@ class UserDB {
     );
     return rows;
   };
+
+  getPlayerStats = async (user_id) => {
+    const { rows } = await query(`SELECT * FROM player_stats p 
+                                JOIN users u ON u.user_id = p.user_id 
+                                WHERE u.user_id = $1`, [user_id])
+
+    return rows
+  }
 }
 
 export default new UserDB();

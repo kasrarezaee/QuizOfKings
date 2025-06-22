@@ -29,6 +29,7 @@ class SessionDB {
     }
 
     finishSession = async (session_id) => {
+        console.log(session_id)
         const { rows: rounds } = await query(`SELECT * FROM sessions s 
                                             JOIN rounds r ON r.session_id = s.session_id
                                             WHERE s.session_id = $1`

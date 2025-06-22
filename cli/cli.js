@@ -275,10 +275,11 @@ const get_session = async (session_id) => {
         await new_round(session)
     }
 
-    if ((allRoundsCompleted && result.length == 3) || !allRoundsCompleted) {
+    else if ((allRoundsCompleted && result.length == 3) || !allRoundsCompleted) {
 
         for (let i = 0; i < result.length; i++) {
-            console.log((i + 1) + "." + result[i].round_status + "   " + result[i].round_id)
+            const roundResult = result[i]?.winner_id == userInfo.data[0].user_id ? "WIN" : "LOSE"
+            console.log((i + 1) + "." + result[i].round_status + "   " + roundResult)
             console.log("-------------------------------------------------")
         }
         const selectedround = await Input("enter round number: ")
@@ -290,6 +291,21 @@ const get_session = async (session_id) => {
             await get_round_question(result[index].round_id)
         }
 
+    }
+
+    else if (allRoundsCompleted && result.length == 3) {
+        const response = await fetch(`http://localhost:9000/api/session/finish/${session_id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'auth-token': userInfo.token
+            }
+        })
+        if (response.status == 200) {
+            clear()
+            console.log("session is finished")
+            states.pop()()
+        }
     }
 
 }
@@ -312,7 +328,8 @@ const get_sessions = async () => {
         states.pop()()
     } else {
         for (let i = 0; i < result.length; i++) {
-            console.log(i + "." + result[i].session_status + "   " + result[i].session_id)
+            const sessionResult = result[i]?.winner_id == userInfo.data[0].user_id ? "WIN" : "LOSE"
+            console.log((i + 1) + "." + result[i].session_status + "   " + result[i].session_id + "   " + sessionResult)
             console.log("-------------------------------------------------")
         }
         const selectedSession = await Input("enter session number: ")
@@ -321,7 +338,7 @@ const get_sessions = async () => {
         }
         else {
             states.push(get_sessions)
-            const index = parseInt(selectedSession)
+            const index = parseInt(selectedSession) - 1
             get_session(result[index].session_id)
         }
     }
@@ -371,6 +388,12 @@ const new_round = async (createdSession) => {
             round_questions: result_2
         })
     })
+
+    console.log(result_2)
+    setTimeout(() => {
+
+    }, 10000);
+
     const result_3 = await response_3.json()
 
     round.data = result_3[0]
@@ -714,11 +737,33 @@ const design_question = async () => {
 
 }
 
+const get_player_stats = async () => {
+    const response = await fetch(`http://localhost:9000/api/users/player-stats/${userInfo.data[0].user_id}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'auth-token': userInfo.token
+        }
+    })
+
+    const result = await response.json()
+
+    clear()
+    console.log(`total games : ${result[0].total_games}`)
+    console.log(`games won : ${result[0].games_won}`)
+    console.log(`average accuracy (won / total) : ${result[0].average_accuracy}`)
+    console.log(`xp level : ${result[0].xp_level}`)
+
+
+    await Input("")
+    states.pop()()
+}
+
 const menu = () => {
     clear()
     console.log("1.start game\n2.sessions\n3.player state\n4.leaderboard\n5.exit")
     let command = ""
-
+    states.push(menu)
     rl.question("", async (answer_0) => {
         command = answer_0
         switch (answer_0) {
@@ -732,8 +777,7 @@ const menu = () => {
                 //states.push(menu)
                 break
             case "3":
-                console.log("getting player state")
-                states.push(menu)
+                await get_player_stats()
                 break
             case "4":
                 console.log("getting leaderboard...")
@@ -766,7 +810,7 @@ const moderator_menu = () => {
                 //states.push(menu)
                 break
             case "3":
-                console.log("getting player state")
+                await get_player_stats()
                 //states.push(menu)
                 break
             case "4":
@@ -802,7 +846,7 @@ const q_designer_menu = () => {
                 //states.push(menu)
                 break
             case "3":
-                console.log("getting player state")
+                await get_player_stats()
                 //states.push(menu)
                 break
             case "4":
@@ -838,7 +882,7 @@ const admin_menu = () => {
                 //states.push(menu)
                 break
             case "3":
-                console.log("getting player state")
+                await get_player_stats()
                 //states.push(menu)
                 break
             case "4":

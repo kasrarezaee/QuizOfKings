@@ -149,6 +149,12 @@ class UserController {
             res.status(404)
         }
     }
+
+    getPlayerStats = async (req, res) => {
+        const { id } = req.params
+        const result = await userService.getPlayerStats(id)
+        res.status(200).json(result)
+    }
 }
 
 export default new UserController();

@@ -1,6 +1,6 @@
 const isBlock = (req, res, next) => {
 
-    if (!req.user.roles[0].is_blocked) {
+    if (!req.user.user[0].is_blocked) {
         next()
     }
     else {

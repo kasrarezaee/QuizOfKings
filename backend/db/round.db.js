@@ -64,13 +64,13 @@ class RoundDB {
         const player1_correct_answers = player1_answers.length
         const player2_correct_answers = player2_answers.length
 
+
         if (await this.isRoundComplete(player_answers)) {
 
             if (player1_correct_answers > player2_correct_answers) {
                 await query(`UPDATE rounds SET winner_id = $1 , round_status = 'COMPLETED' 
                                 WHERE session_id = $2 and round_number = $3`
                     , [player1_id, session_id, round_number])
-
 
             } else if (player1_correct_answers < player2_correct_answers) {
                 await query(`UPDATE rounds SET winner_id = $1 , round_status = 'COMPLETED'
@@ -146,6 +146,7 @@ class RoundDB {
         const { rows: question_answer } = await query(`SELECT correct_answer 
                                              FROM questions WHERE question_id = $1`
             , [question_id])
+
         let result = {}
 
         if (user_id == users[0].player1_id) {

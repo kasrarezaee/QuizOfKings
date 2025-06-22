@@ -69,7 +69,7 @@ class AuthService {
                 const userRoles = await userDb.getUserRoles(user_id)
 
                 const token = await this.signToken({
-                    id: user_id,
+                    user: user,
                     roles: userRoles
                 })
 

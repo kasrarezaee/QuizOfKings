@@ -61,8 +61,14 @@ CREATE TABLE player_stats (
   user_id INT PRIMARY KEY REFERENCES users(user_id),
   total_games INT DEFAULT 0,
   games_won INT DEFAULT 0,
-  average_accuracy DECIMAL(5,2) DEFAULT 0.00
+  average_accuracy DECIMAL(5,2) GENERATED ALWAYS AS (
+    CASE 
+      WHEN total_games = 0 THEN 0
+      ELSE ROUND((games_won::DECIMAL / total_games) * 100, 2)
+    END
+  ) STORED
 );
+
 
 CREATE TABLE roles (
   role_id SERIAL PRIMARY KEY,
@@ -145,3 +151,74 @@ FROM player_stats ps
 JOIN users u ON ps.user_id = u.user_id
 ORDER BY u.xp_level DESC, ps.games_won DESC
 LIMIT 10;
+
+
+CREATE OR REPLACE FUNCTION increase_xp_on_correct_answer()
+RETURNS TRIGGER AS $$
+DECLARE
+  correct TEXT;  -- store ENUM as text
+BEGIN
+  -- Get the correct answer as text
+  SELECT correct_answer::TEXT INTO correct
+  FROM questions
+  WHERE question_id = NEW.question_id;
+
+  -- For player 1
+  IF NEW.player1_answer IS NOT NULL AND NEW.player1_answer::TEXT = correct THEN
+    UPDATE users
+    SET xp_level = xp_level + 1
+    WHERE user_id = (
+      SELECT s.player1_id
+      FROM sessions s
+      JOIN rounds r ON r.session_id = s.session_id
+      WHERE r.round_id = NEW.round_id
+      LIMIT 1
+    );
+  END IF;
+
+  -- For player 2
+  IF NEW.player2_answer IS NOT NULL AND NEW.player2_answer::TEXT = correct THEN
+    UPDATE users
+    SET xp_level = xp_level + 1
+    WHERE user_id = (
+      SELECT s.player2_id
+      FROM sessions s
+      JOIN rounds r ON r.session_id = s.session_id
+      WHERE r.round_id = NEW.round_id
+      LIMIT 1
+    );
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER trigger_increase_xp
+AFTER INSERT OR UPDATE OF player1_answer, player2_answer ON round_questions
+FOR EACH ROW
+EXECUTE FUNCTION increase_xp_on_correct_answer();
+
+
+
+INSERT INTO leaderboard_history (
+  user_id, period_type, start_time, end_time, rank, score
+)
+SELECT 
+  u.user_id,
+  'WEEKLY',  -- Or 'MONTHLY'
+  CURRENT_DATE - INTERVAL '7 days',  -- Adjust for period
+  CURRENT_DATE,
+  RANK() OVER (ORDER BY ps.games_won DESC, u.xp_level DESC),
+  ps.games_won
+FROM player_stats ps
+JOIN users u ON u.user_id = ps.user_id;
+
+
+-- Show last week's top 5
+SELECT * FROM leaderboard_history
+WHERE period_type = 'WEEKLY'
+  AND end_time = (SELECT MAX(end_time) FROM leaderboard_history WHERE period_type = 'WEEKLY')
+ORDER BY rank ASC
+LIMIT 5;
+
