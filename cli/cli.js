@@ -242,7 +242,8 @@ const get_turn = async (session_id) => {
     return false
 }
 
-const get_session = async (session_id) => {
+const get_session = async (session_id, admin_option) => {
+
     clear()
 
     const response = await fetch(`http://localhost:9000/api/session/session/${session_id}`, {
@@ -263,7 +264,18 @@ const get_session = async (session_id) => {
     })
     const your_turn = await get_turn(session_id)
 
-    if (allRoundsCompleted && your_turn && result.length != 3) {
+
+
+    if ((userInfo.roles.length !== 0 && userInfo.roles[0].role_name == "admin") && admin_option == "2") {
+        for (let i = 0; i < result.length; i++) {
+            //const roundResult = result[i]?.winner_id == userInfo.data[0].user_id ? "WIN" : "LOSE"
+            console.log((i + 1) + "." + result[i].round_status + "   " + (result[i].winner_id != null ? result[i].winner_id : ""))
+            console.log("-------------------------------------------------")
+        }
+        await Input("")
+        states.pop()()
+    }
+    else if (allRoundsCompleted && your_turn && result.length != 3) {
 
         console.log("your turn to create new round...")
         await Input("")
@@ -275,10 +287,25 @@ const get_session = async (session_id) => {
         await new_round(session)
     }
 
-    else if ((allRoundsCompleted && result.length == 3) || !allRoundsCompleted) {
+    else if ((allRoundsCompleted && result.length == 3) || (allRoundsCompleted && !your_turn) || !allRoundsCompleted) {
 
         for (let i = 0; i < result.length; i++) {
-            const roundResult = result[i]?.winner_id == userInfo.data[0].user_id ? "WIN" : "LOSE"
+            let roundResult = ""
+            if ((userInfo.roles.length !== 0 && userInfo.roles[0].role_name == "admin") && option == "2") {
+                roundResult = result[i].winner_id !== null ? result[i].winner_id : ""
+            }
+            else {
+                if (result[i].winner_id === null) {
+                    if (result[i].round_status == 'COMPLETED') {
+                        roundResult = "DRAW"
+                    } else {
+                        roundResult = "PENDING"
+                    }
+                } else {
+                    roundResult = result[i].winner_id == userInfo.data[0].user_id ? "WIN" : "LOSE"
+                }
+            }
+            //const roundResult = result[i]?.winner_id == userInfo.data[0].user_id ? "WIN" : "LOSE"
             console.log((i + 1) + "." + result[i].round_status + "   " + roundResult)
             console.log("-------------------------------------------------")
         }
@@ -313,7 +340,30 @@ const get_session = async (session_id) => {
 const get_sessions = async () => {
     //   states.push(menu)
     clear()
-    const response = await fetch(`http://localhost:9000/api/session/user/${userInfo.data[0].user_id}`, {
+
+    let url = ""
+    let option = ""
+    if ((userInfo.roles.length !== 0 && userInfo.roles[0].role_name == "admin")) {
+
+        console.log("1.your sessions        2.other's sessions")
+
+        option = await Input("")
+
+        if (option == "1") {
+            url = `http://localhost:9000/api/session/user/${userInfo.data[0].user_id}`
+        } else if (option == "2") {
+            url = `http://localhost:9000/api/session/`
+        } else {
+            states.pop()()
+            return;
+        }
+    }
+    else {
+        url = `http://localhost:9000/api/session/user/${userInfo.data[0].user_id}`
+    }
+
+
+    const response = await fetch(url, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -327,19 +377,36 @@ const get_sessions = async () => {
         await Input("")
         states.pop()()
     } else {
+        clear()
         for (let i = 0; i < result.length; i++) {
-            const sessionResult = result[i]?.winner_id == userInfo.data[0].user_id ? "WIN" : "LOSE"
+            let sessionResult = ""
+            if ((userInfo.roles.length !== 0 && userInfo.roles[0].role_name == "admin") && option == "2") {
+                sessionResult = result[i].winner_id !== null ? result[i].winner_id : ""
+            }
+            else {
+                if (result[i].winner_id === null) {
+                    if (result[i].session_status == 'COMPLETED') {
+                        sessionResult = "DRAW"
+                    } else {
+                        sessionResult = "PENDING"
+                    }
+                } else {
+                    sessionResult = result[i].winner_id == userInfo.data[0].user_id ? "WIN" : "LOSE"
+                }
+            }
             console.log((i + 1) + "." + result[i].session_status + "   " + result[i].session_id + "   " + sessionResult)
             console.log("-------------------------------------------------")
         }
+
         const selectedSession = await Input("enter session number: ")
+
         if (selectedSession === "") {
             states.pop()()
         }
         else {
             states.push(get_sessions)
             const index = parseInt(selectedSession) - 1
-            get_session(result[index].session_id)
+            get_session(result[index].session_id, option)
         }
     }
 
@@ -388,11 +455,6 @@ const new_round = async (createdSession) => {
             round_questions: result_2
         })
     })
-
-    console.log(result_2)
-    setTimeout(() => {
-
-    }, 10000);
 
     const result_3 = await response_3.json()
 
