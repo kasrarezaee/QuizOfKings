@@ -155,6 +155,13 @@ class UserController {
         const result = await userService.getPlayerStats(id)
         res.status(200).json(result)
     }
+
+    getLeaderboard = async (req, res) => {
+        const { period } = req.params
+        const result = await userService.getLeaderboard(period)
+        res.status(200).json(result)
+    }
+
 }
 
 export default new UserController();

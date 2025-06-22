@@ -53,6 +53,5 @@ get random question
 
 
 ----------------
-admin should see the sessions and rounds
-players should see player stats and leaderboard
+players should see leaderboard
 

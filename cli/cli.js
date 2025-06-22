@@ -29,52 +29,58 @@ const login_page = async () => {
     let email = ""
     let password = ""
 
+    console.log("don't have an account?")
+    const haveAccount = await Input("")
 
-    const answer_0 = await Input("email: ")
-    email = answer_0
+    if (haveAccount == "yes") {
 
-    const answer_1 = await Input("password: ")
-    password = answer_1
-    const postData = JSON.stringify({
-        "email": email,
-        "password": password
-    })
-    //const { token, user, userRoles }
-    const result = await fetch('http://localhost:9000/api/auth/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: postData
-    })
-    const { user, userRoles, token } = await result.json()
-    result.headers.forEach(e => {
-        if (e.startsWith("refresh-token")) {
-            userInfo.refreshToken = e.replace("refresh-token", "refreshToken")
+        const answer_0 = await Input("email: ")
+        email = answer_0
+
+        const answer_1 = await Input("password: ")
+        password = answer_1
+        const postData = JSON.stringify({
+            "email": email,
+            "password": password
+        })
+        //const { token, user, userRoles }
+        const result = await fetch('http://localhost:9000/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: postData
+        })
+        const { user, userRoles, token } = await result.json()
+        result.headers.forEach(e => {
+            if (e.startsWith("refresh-token")) {
+                userInfo.refreshToken = e.replace("refresh-token", "refreshToken")
+            }
+        })
+
+        userInfo.data = user
+        userInfo.roles = userRoles
+        userInfo.token = token
+        console.log("login:")
+        console.log(userInfo)
+        console.log("---------------------------------------")
+        if (userRoles.length != 0) {
+            if (userRoles[0].role_name === 'admin') {
+                admin_menu()
+            } else if (userRoles[0].role_name === 'moderator') {
+                moderator_menu()
+            } else if (userRoles[0].role_name === 'question_designer') {
+                q_designer_menu()
+            }
         }
-    })
-
-    userInfo.data = user
-    userInfo.roles = userRoles
-    userInfo.token = token
-    console.log("login:")
-    console.log(userInfo)
-    console.log("---------------------------------------")
-    if (userRoles.length != 0) {
-        if (userRoles[0].role_name === 'admin') {
-            admin_menu()
-        } else if (userRoles[0].role_name === 'moderator') {
-            moderator_menu()
-        } else if (userRoles[0].role_name === 'question_designer') {
-            q_designer_menu()
+        else {
+            menu()
         }
+
+    } else {
+        await signup_page()
     }
-    else {
-        menu()
-        //setInterval(() => {
-        //    refresh_token()
-        //}, 1000)
-    }
+
 }
 
 const signup_page = async () => {
@@ -114,7 +120,6 @@ const signup_page = async () => {
     userInfo.data = newUser
     userInfo.auth_token = token
     menu()
-    //rl.close()
 }
 
 const answer_question = async (round) => {
@@ -188,7 +193,6 @@ const refresh_token = async () => {
 }
 
 const new_session = async () => {
-    //states.push(menu)
     const session = {}
     const response = await fetch(`http://localhost:9000/api/session/user/${userInfo.data[0].user_id}`, {
         method: 'POST',
@@ -207,7 +211,6 @@ const new_session = async () => {
         session.data = result[0]
         await new_round(session)
     }
-    //return session
 }
 
 const get_round_question = async (round_id) => {
@@ -268,7 +271,6 @@ const get_session = async (session_id, admin_option) => {
 
     if ((userInfo.roles.length !== 0 && userInfo.roles[0].role_name == "admin") && admin_option == "2") {
         for (let i = 0; i < result.length; i++) {
-            //const roundResult = result[i]?.winner_id == userInfo.data[0].user_id ? "WIN" : "LOSE"
             console.log((i + 1) + "." + result[i].round_status + "   " + (result[i].winner_id != null ? result[i].winner_id : ""))
             console.log("-------------------------------------------------")
         }
@@ -305,7 +307,6 @@ const get_session = async (session_id, admin_option) => {
                     roundResult = result[i].winner_id == userInfo.data[0].user_id ? "WIN" : "LOSE"
                 }
             }
-            //const roundResult = result[i]?.winner_id == userInfo.data[0].user_id ? "WIN" : "LOSE"
             console.log((i + 1) + "." + result[i].round_status + "   " + roundResult)
             console.log("-------------------------------------------------")
         }
@@ -338,7 +339,6 @@ const get_session = async (session_id, admin_option) => {
 }
 
 const get_sessions = async () => {
-    //   states.push(menu)
     clear()
 
     let url = ""
@@ -715,8 +715,6 @@ const report_action = async (moderator_id, target_user_id, target_question_id, a
         })
     })
 
-
-
     if (response.status == 200) return "action reported successfully"
 
 }
@@ -799,6 +797,48 @@ const design_question = async () => {
 
 }
 
+const get_leaderboard = async () => {
+
+    clear()
+
+    console.log("want to see top 5 in which period of time:")
+    console.log("1.weekly   2.monthly")
+    const period = await Input("")
+    let url = ``
+    switch (period) {
+        case "1":
+            url = `http://localhost:9000/api/users/leaderboard/weekly`
+            break;
+
+        case "2":
+            url = `http://localhost:9000/api/users/leaderboard/monthly`
+            break;
+    }
+
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'auth-token': userInfo.token
+        }
+    })
+
+    const result = await response.json()
+
+    console.log(`| ${'Username'.padEnd(15)} | ${'XP Level'.padEnd(8)} | ${'Score'.padEnd(6)} | ${'Rank'.padEnd(5)} |`);
+    console.log('-'.repeat(50));
+
+    for (let i = 0; i < result.length; i++) {
+        const { username, xp_level, score, rank } = result[i];
+        console.log(`| ${username.padEnd(15)} | ${String(xp_level).padEnd(8)} | ${String(score).padEnd(6)} | ${String(rank).padEnd(5)} |`);
+    }
+
+
+    await Input("")
+    states.pop()()
+}
+
+
 const get_player_stats = async () => {
     const response = await fetch(`http://localhost:9000/api/users/player-stats/${userInfo.data[0].user_id}`, {
         method: 'GET',
@@ -842,8 +882,7 @@ const menu = () => {
                 await get_player_stats()
                 break
             case "4":
-                console.log("getting leaderboard...")
-                states.push(menu)
+                await get_leaderboard()
                 break
             case "5":
                 rl.close()
@@ -865,19 +904,15 @@ const moderator_menu = () => {
             case "1":
                 clear()
                 await new_session()
-                //states.push(menu)
                 break
             case "2":
                 await get_sessions()
-                //states.push(menu)
                 break
             case "3":
                 await get_player_stats()
-                //states.push(menu)
                 break
             case "4":
-                console.log("getting leaderboard...")
-                // states.push(menu)
+                await get_leaderboard()
                 break
             case "5":
                 await get_questions()
@@ -901,19 +936,15 @@ const q_designer_menu = () => {
             case "1":
                 clear()
                 await new_session()
-                //states.push(menu)
                 break
             case "2":
                 await get_sessions()
-                //states.push(menu)
                 break
             case "3":
                 await get_player_stats()
-                //states.push(menu)
                 break
             case "4":
-                console.log("getting leaderboard...")
-                //states.push(menu)
+                await get_leaderboard()
                 break
             case "5":
                 await design_question()
@@ -937,25 +968,20 @@ const admin_menu = () => {
             case "1":
                 clear()
                 await new_session()
-                //states.push(menu)
                 break
             case "2":
                 await get_sessions()
-                //states.push(menu)
                 break
             case "3":
                 await get_player_stats()
-                //states.push(menu)
                 break
             case "4":
-                console.log("getting leaderboard...")
-                //states.push(menu)
+                await get_leaderboard()
                 break
             case "5":
                 await design_question()
                 break;
             case "6":
-                //states.push(admin_menu)
                 await get_questions()
                 break;
             case "7":
@@ -968,6 +994,4 @@ const admin_menu = () => {
     })
 }
 
-//menu()
-//signup_page()
 login_page()

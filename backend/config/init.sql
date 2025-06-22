@@ -206,8 +206,8 @@ INSERT INTO leaderboard_history (
 )
 SELECT 
   u.user_id,
-  'WEEKLY',  -- Or 'MONTHLY'
-  CURRENT_DATE - INTERVAL '7 days',  -- Adjust for period
+  'WEEKLY',  
+  CURRENT_DATE - INTERVAL '7 days',  
   CURRENT_DATE,
   RANK() OVER (ORDER BY ps.games_won DESC, u.xp_level DESC),
   ps.games_won

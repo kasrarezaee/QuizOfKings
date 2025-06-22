@@ -126,6 +126,61 @@ class UserDB {
 
     return rows
   }
+
+  getLeaderboard = async (period) => {
+    switch (period) {
+      case 'weekly':
+        await query(`INSERT INTO leaderboard_history (
+          user_id, period_type, start_time, end_time, rank, score
+        )
+        SELECT 
+        u.user_id,
+        'WEEKLY',  
+        CURRENT_DATE - INTERVAL '7 days',  
+        CURRENT_DATE,
+        RANK() OVER (ORDER BY ps.games_won DESC, u.xp_level DESC),
+        ps.games_won
+        FROM player_stats ps
+        JOIN users u ON u.user_id = ps.user_id;
+        `)
+
+        const { rows: weekly_leaderboard } = await query(`SELECT * FROM leaderboard_history l
+                          JOIN users u ON u.user_id = l.user_id 
+                          WHERE l.period_type = 'WEEKLY'
+                          AND l.end_time = (SELECT MAX(end_time) 
+                          FROM leaderboard_history WHERE period_type = 'WEEKLY')
+                          ORDER BY rank ASC
+                          LIMIT 5;`)
+        return weekly_leaderboard;
+
+
+      case 'monthly':
+        await query(`INSERT INTO leaderboard_history (
+          user_id, period_type, start_time, end_time, rank, score
+        )
+        SELECT 
+        u.user_id,
+        'MONTHLY',  
+        CURRENT_DATE - INTERVAL '30 days',  
+        CURRENT_DATE,
+        RANK() OVER (ORDER BY ps.games_won DESC, u.xp_level DESC),
+        ps.games_won
+        FROM player_stats ps
+        JOIN users u ON u.user_id = ps.user_id;
+        `)
+
+        const { rows: monthly_leaderboard } = await query(`SELECT * FROM leaderboard_history l
+                          JOIN users u ON u.user_id = l.user_id 
+                          WHERE l.period_type = 'MONTHLY'
+                          AND l.end_time = (SELECT MAX(end_time) 
+                          FROM leaderboard_history WHERE period_type = 'MONTHLY')
+                          ORDER BY rank ASC
+                          LIMIT 5;`)
+
+        return monthly_leaderboard
+
+    }
+  }
 }
 
 export default new UserDB();

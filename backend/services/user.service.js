@@ -125,6 +125,14 @@ class UserService {
         }
     }
 
+    getLeaderboard = async (period) => {
+        try {
+            return await userDb.getLeaderboard(period)
+        } catch (err) {
+            throw new Error(err)
+        }
+    }
+
 }
 
 export default new UserService()

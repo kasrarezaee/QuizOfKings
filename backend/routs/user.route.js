@@ -34,5 +34,7 @@ router.route("/username/:username").get(userController.getUserByUserName)
 
 router.route("/player-stats/:id").get(userController.getPlayerStats)
 
+router.route("/leaderboard/:period").get(userController.getLeaderboard)
+
 
 export default router
