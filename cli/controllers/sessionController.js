@@ -4,6 +4,7 @@ import { Input } from "../utils/input.js"
 import { userInfo } from "./authController.js"
 import { clear } from "console"
 import { get_turn, new_round, get_round_question } from "./roundController.js"
+import { chat } from "./messageController.js"
 
 export const new_session = async () => {
     const session = {}
@@ -80,22 +81,30 @@ export const get_session = async (session_id, admin_option) => {
             console.log((i + 1) + "." + result[i].round_status + "   " + roundResult)
             console.log("-------------------------------------------------")
         }
-        const selectedround = await Input("enter round number: ")
-        if (selectedround === "") {
+        console.log("\n" + (result.length + 1) + ".chat" + "\n")
+        const option = await Input("enter round number: ")
+
+        if (option === "") {
             states.pop()()
-        }
-        else {
-            const index = parseInt(selectedround) - 1
+        } else if (option == result.length + 1) {
+
+            states.push(async () => {
+                await get_session(session_id)
+            })
+            await chat(session_id)
+        } else {
+            const index = parseInt(option) - 1
             await get_round_question(result[index].round_id)
         }
 
     }
 
-    else if (allRoundsCompleted && result.length == 3) {
+    if (allRoundsCompleted && result.length == 3) {
         const response = await apiCall(API_CONFIG.BASE_URL + ROUTES.SESSIONS + "finish/" + session_id, 'POST', userInfo.token)
         if (response.status == 200) {
             clear()
             console.log("session is finished")
+            await Input("")
             states.pop()()
         }
     }

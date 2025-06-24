@@ -18,6 +18,7 @@ export const ROUTES = {
     ROLES: '/api/role/',
     ROUNDS: '/api/round/',
     CATEGORY: '/api/category/',
+    MESSAGE: '/api/message/',
     MODERATION: '/api/moderation/',
 };
 
