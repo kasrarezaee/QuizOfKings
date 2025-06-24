@@ -26,7 +26,7 @@ export const chat = async (session_id) => {
     socket.emit("join", session_id)
 
 
-    await showMessages(sender_id, receiver_id)
+    await showMessages(session_id)
 
     socket.on('message', async (message) => {
         messages.push(message)
@@ -52,9 +52,12 @@ export const chat = async (session_id) => {
         await chat(session_id)
     })
 
-    console.log(chalk.blue("options"))
-    console.log("1.send message")
-    if (messages.length != 0) console.log("2.update message\n3.delete message")
+    if (!(userInfo.roles[0].role_name == "admin" && (userInfo.data[0].user_id != player1 && userInfo.data[0].user_id != player2))) {
+        console.log(chalk.blue("options"))
+        console.log("1.send message")
+        if (messages.length != 0) console.log("2.update message\n3.delete message")
+    }
+
 
     const option = await Input("")
 
@@ -66,7 +69,7 @@ export const chat = async (session_id) => {
                 await chat(session_id)
             })
             const message_body = await Input("")
-            socket.emit("send message", { message_body, receiver_id, sender_id })
+            socket.emit("send message", { session_id, message_body, receiver_id, sender_id })
             states.pop()()
             break;
 
@@ -96,7 +99,7 @@ export const chat = async (session_id) => {
             states.push(async () => {
                 await chat(session_id)
             })
-            console.log("which message you want to delete? ")
+            console.log(chalk.blue("which message you want to delete? "))
             let mes_number = await Input("")
             clear()
             let mes_id = messages[parseInt(mes_number) - 1].message_id
@@ -115,9 +118,9 @@ export const chat = async (session_id) => {
 
 }
 
-const showMessages = async (sender_id, receiver_id) => {
+const showMessages = async (session_id) => {
 
-    const response = await apiCall(API_CONFIG.BASE_URL + ROUTES.MESSAGE + sender_id + "/" + receiver_id, 'GET', userInfo.token)
+    const response = await apiCall(API_CONFIG.BASE_URL + ROUTES.MESSAGE + "session/" + session_id, 'GET', userInfo.token)
     messages = await response.json()
 
     console.log(chalk.blue("messages: "))

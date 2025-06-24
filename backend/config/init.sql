@@ -113,6 +113,14 @@ CREATE TABLE messages (
   is_deleted BOOLEAN DEFAULT FALSE
 );
 
+CREATE TABLE session_messages (
+  session_id INT NOT NULL,
+  message_id INT NOT NULL,
+  PRIMARY KEY (session_id, message_id),
+  FOREIGN KEY (session_id) REFERENCES sessions(session_id),
+  FOREIGN KEY (message_id) REFERENCES messages(message_id)
+);
+
 CREATE INDEX idx_questions_category ON questions(category_id);
 CREATE INDEX idx_sessions_players ON sessions(player1_id, player2_id);
 CREATE INDEX idx_questions_difficulty ON questions(difficulty);

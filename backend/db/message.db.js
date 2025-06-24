@@ -2,10 +2,13 @@ import db from "../config/db.js";
 const { query, closeConnection } = db;
 
 class MessageDB {
-    createMessage = async (sender_id, receiver_id, message_body) => {
+    createMessage = async (session_id, sender_id, receiver_id, message_body) => {
         const { rows } = await query(`INSERT INTO messages(sender_id , receiver_id , message_body)
-                                    VALUES ($1 , $2 , $3)` , [sender_id, receiver_id, message_body])
+                                    VALUES ($1 , $2 , $3) RETURNING * ` , [sender_id, receiver_id, message_body])
 
+
+        await query(`INSERT INTO session_messages (session_id , message_id) VALUES($1 , $2)`
+            , [session_id, rows[0].message_id])
         return rows
     }
 
@@ -26,14 +29,15 @@ class MessageDB {
         return rows
     }
 
-    getMessages = async (sender_id, receiver_id) => {
-        const { rows } = await query(`SELECT * FROM messages 
-            WHERE ((sender_id = $1 AND receiver_id = $2) OR (sender_id = $3 AND receiver_id = $4)) AND is_deleted = false
-            ORDER BY time_stamp ASC`
-            , [sender_id, receiver_id, receiver_id, sender_id])
+    getMessages = async (session_id) => {
 
+        const { rows } = await query(`SELECT * FROM session_messages sm 
+                                    JOIN messages m ON m.message_id = sm.message_id
+                                    WHERE sm.session_id = $1 AND m.is_deleted = false ORDER BY m.time_stamp ASC` , [session_id])
         return rows
     }
+
+
 }
 
 export default new MessageDB()

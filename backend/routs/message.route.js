@@ -3,9 +3,12 @@ import express from "express"
 
 const router = express.Router()
 
-router.route("/:sender_id/:receiver_id")
+router.route("/")
     .post(messageController.createMessage)
+
+router.route("/session/:session_id")
     .get(messageController.getMessages)
+
 router.route("/:message_id")
     .post(messageController.updateMessage)
     .delete(messageController.deleteMessage)

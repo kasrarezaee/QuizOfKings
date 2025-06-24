@@ -22,9 +22,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on("send message", async (message) => {
-        const { sender_id, receiver_id, message_body } = message;
-        console.log("here on send message")
-        await messageService.createMessage(sender_id, receiver_id, message_body);
+        const { session_id, sender_id, receiver_id, message_body } = message;
+        await messageService.createMessage(session_id, sender_id, receiver_id, message_body);
         socket.to(roomName).emit('message', message_body);
     });
 

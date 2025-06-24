@@ -128,6 +128,10 @@ export const get_leaderboard = async () => {
     console.log("1.weekly   2.monthly")
     const period = await Input("")
     let url = ``
+    if (period == "") {
+        states.pop()()
+        return
+    }
     switch (period) {
         case "1":
             url = `${API_CONFIG.BASE_URL}${ROUTES.LEADERBOARD}weekly`

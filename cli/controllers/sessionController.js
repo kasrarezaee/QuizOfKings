@@ -45,8 +45,16 @@ export const get_session = async (session_id, admin_option) => {
             console.log((i + 1) + "." + result[i].round_status + "   " + (result[i].winner_id != null ? result[i].winner_id : ""))
             console.log("-------------------------------------------------")
         }
-        await Input("")
-        states.pop()()
+        console.log("\n" + (result.length + 1) + ".chat" + "\n")
+        const option = await Input("")
+        if (option === "") {
+            states.pop()()
+        } else if (option == result.length + 1) {
+            states.push(async () => {
+                await get_session(session_id, admin_option)
+            })
+            await chat(session_id)
+        }
     }
     else if (allRoundsCompleted && your_turn && result.length != 3) {
 
@@ -89,14 +97,13 @@ export const get_session = async (session_id, admin_option) => {
         } else if (option == result.length + 1) {
 
             states.push(async () => {
-                await get_session(session_id)
+                await get_session(session_id, admin_option)
             })
             await chat(session_id)
         } else {
             const index = parseInt(option) - 1
             await get_round_question(result[index].round_id)
         }
-
     }
 
     if (allRoundsCompleted && result.length == 3) {
