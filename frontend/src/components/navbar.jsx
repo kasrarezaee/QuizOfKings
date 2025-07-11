@@ -14,8 +14,8 @@ import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import SettingsIcon from '@mui/icons-material/Settings';
 
-const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const pages = ['player stat' , 'leader board'];
+const settings = ['Logout' , 'about'];
 
 function Navbar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -37,7 +37,7 @@ function Navbar() {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="fixed" >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <QuizIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
@@ -56,7 +56,7 @@ function Navbar() {
               textDecoration: 'none',
             }}
           >
-            Quiz Of Kings
+            Quiz Master
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -110,7 +110,7 @@ function Navbar() {
               textDecoration: 'none',
             }}
           >
-            Quiz Of Kings
+            Quiz Master
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
