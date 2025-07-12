@@ -7,7 +7,6 @@ const Login = () =>{
     return(
         <> 
             <Box
-                
                 display={"flex"}
                 justifyContent={"center"}
                 alignItems={"center"}
