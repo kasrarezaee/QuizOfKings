@@ -1,12 +1,12 @@
-1.question page answer review confirm or reject
-2.category page
-3.sessions page
-4.leader board page
-5.player stat page
+1.question page answer review confirm or reject @
+2.category page @
+3.sessions page @
+4.leader board page @
+5.player stat page @
 6.about page
-7.session page
-8.rounds page
+7.session page 
+8.round page
 9.chat page
-10.users page
+10.users page@
 11.question design page
 12.user page asign_role profile visit
