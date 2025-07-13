@@ -2,6 +2,7 @@ import { Box , Button, Paper, TextField, Typography } from "@mui/material"
 
 
 const CategorySelect = ()=>{
+    const categoies = ['history' , 'math' , 'music']
     return(
         <Box
             gap={4}
@@ -33,12 +34,9 @@ const CategorySelect = ()=>{
                     textShadow: '1px 1px 2px rgba(0,0,0,0.2)',
                   }}
                 >
-                  Chose a category for this round.
+                  Chose a category.
                 </Typography>
-
-                <Button variant='contained'>Paris</Button>
-                <Button variant='contained'>Berlin</Button>
-                <Button variant='contained'>Madrid</Button>
+                {categoies.map(a => <Button variant='contained'>{a}</Button>)}
             </Paper>      
         </Box>
     )

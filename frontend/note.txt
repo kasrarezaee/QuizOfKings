@@ -4,9 +4,9 @@
 4.leader board page @
 5.player stat page @
 6.about page
-7.session page 
-8.round page
-9.chat page
+7.session page @
+8.round page @
+9.chat page@
 10.users page@
-11.question design page
-12.user page asign_role profile visit
+11.question design page@
+12.user page asign_role profile visit@

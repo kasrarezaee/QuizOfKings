@@ -1,12 +1,20 @@
-import { Box, Paper, Typography, Divider } from "@mui/material"
+import { Box, Paper, Typography, Divider , Button , InputLabel , MenuItem , FormControl , Select, TextField} from "@mui/material"
+import { useState } from "react";
 
-const PlayerStats = () => {
+const Profile = () => {
     // Sample static values – replace with props/state as needed
     const totalGames = 25;
     const gamesWon = 18;
     const accuracy = ((gamesWon / totalGames) * 100).toFixed(1) + "%";
     const xpLevel = 7;
-
+    const [role , setRole] = useState('')
+    const [clicked , setClicked] = useState(false)
+    const handleClick = ()=>{
+        setClicked(prev=>!prev)
+    }
+    const handleChange = (event)=>{
+        setRole(event.target.value)
+    }
     return (
         <Box
             display={"flex"}
@@ -14,6 +22,7 @@ const PlayerStats = () => {
             alignItems={"center"}
             minHeight={'100vh'}
             bgcolor={'rgba(54, 140, 238, 0.36)'}
+            flexDirection={'column'}
         >
             <Paper
                 elevation={24}
@@ -21,7 +30,7 @@ const PlayerStats = () => {
                     padding: 4,
                     width: 320,
                     borderRadius: 4,
-                    background: 'linear-gradient(135deg, #576cdfff 30%, #91c4eeff 90%)',
+                    background: 'linear-gradient(135deg, #304ceeff 30%, #47a2ecff 90%)',
                     color: 'white',
                     display: 'flex',
                     flexDirection: 'column',
@@ -51,8 +60,30 @@ const PlayerStats = () => {
                     ⭐ <strong>XP Level:</strong> {xpLevel}
                 </Typography>
             </Paper>
+            <FormControl sx={{width:'200px' , mt:'20px'}}>
+              <InputLabel id="demo-simple-select-label">Role</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={role}
+                label="Role"
+                onChange={handleChange}
+              >
+                <MenuItem value={"moderator"}>moderator</MenuItem>
+                <MenuItem value={"admin"}>admin</MenuItem>
+                <MenuItem value={"question_designer"}>question designer</MenuItem>
+              </Select>
+            </FormControl>
+
+            <Button
+                type="submit"
+                variant={clicked?"outlined":"contained"}
+                color="primary"
+                sx={{mt:'10px' , borderRadius:"10px"}}
+                onClick={handleClick}
+            >{clicked?"unblock":"block"}</Button>
         </Box>
     )
 }
 
-export default PlayerStats
+export default Profile

@@ -5,13 +5,15 @@ import Login from "./pages/Login"
 import Menu from "./pages/Menu"
 import QuestionAnswer from "./pages/QuestionAnswer"
 import SignUp from "./pages/Signup"
-import PlayerStats from "./pages/PlayerStats"
+import Profile from "./pages/Profile"
 import User from "./components/User"
 import Session from "./components/Session"
+import QuestionDesign from "./pages/QustionDesign"
+import ChatPage from "./pages/ChatPage"
 function App() {
   return (
     <>
-      <Session/>
+      <ChatPage/>
     </>
   )
 }
