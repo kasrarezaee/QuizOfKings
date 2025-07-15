@@ -10,11 +10,13 @@ import User from "./components/User"
 import Session from "./components/Session"
 import QuestionDesign from "./pages/QustionDesign"
 import ChatPage from "./pages/ChatPage"
+import { QueryClient , QueryClientProvider } from "react-query"
 function App() {
+  const query = new QueryClient()
   return (
-    <>
-      <ChatPage/>
-    </>
+    <QueryClientProvider client={query}>
+      <Login/>
+    </QueryClientProvider>
   )
 }
 

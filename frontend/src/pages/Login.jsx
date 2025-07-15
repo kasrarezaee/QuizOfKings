@@ -1,9 +1,29 @@
-import { useState } from "react";
-import {Box , Button , TextField , Typography , Paper} from '@mui/material'
-import { blue } from "@mui/material/colors";
-
+import { useMutation } from 'react-query'
+import {Alert , Box , Button , TextField , Typography , Paper} from '@mui/material'
+import { apiCall } from '../services/apiClient'
+import { API_CONFIG , ROUTES} from '../config/settings'
+import { useForm } from 'react-hook-form'
+import * as yup from 'yup'
+import {yupResolver} from "@hookform/resolvers/yup"
 const Login = () =>{
-    //'rgba(73, 122, 177, 0.68)'
+    const schema = yup.object().shape({
+        email: yup.string()/*.email("invalid email")*/.required("email must be provided") ,
+        password: yup.string().required("password must be provided")
+    })
+    const {register , handleSubmit , formState:{errors}} = useForm({resolver:yupResolver(schema)})
+    const mutation = useMutation(
+        async (formData)=>{
+            const response = await apiCall(API_CONFIG.BASE_URL+ROUTES.LOGIN , 'POST' , '' , formData)
+            return await response.json()
+        },
+        {
+            onSuccess:(data)=> console.log(data),
+            onError:(error)=>console.log(error)
+        }
+    )
+    const onSubmit = (data)=>{
+        mutation.mutate(data)
+    }
     return(
         <> 
             <Box
@@ -25,21 +45,28 @@ const Login = () =>{
                     >
                         Login
                     </Typography>
-                    <form>
+                    <form onSubmit={handleSubmit(onSubmit)}>
                         <TextField
+                            error={!!errors.email}
+                            helperText={errors.email?.message}
                             label="email"
-                            type="email"
+                            //type="email"
                             variant="outlined"
                             fullWidth
-                            margin="normal"    
+                            margin="normal"
+                            {...register("email")}
+                            
                         />
                         <TextField
+                            error={!!errors.password}
+                            helperText={errors.password?.message}
                             label="password"
                             type="password"
                             variant="outlined"
                             fullWidth
                             color="primary"
                             margin="normal"
+                            {...register("password")}
                             
                         />
                         <Button
@@ -49,6 +76,7 @@ const Login = () =>{
                         >
                             don't have an account?
                         </Button>
+                        {mutation.error?.message && <Alert severity="error" sx={{backgroundColor:'transparent' , justifyContent:'center'}}>login failed</Alert>}
                         <Button
                             type="submit"
                             variant="contained"
