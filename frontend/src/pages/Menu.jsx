@@ -1,6 +1,8 @@
 import { Paper, Box, Button, Stack, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const Menu = () => {
+  const navigate = useNavigate()
   return (
     <Box
       display={"flex"}
@@ -45,10 +47,10 @@ const Menu = () => {
         }}
       >
         <Stack spacing={2}>
-          <Button variant="contained" color="primary">
+          <Button variant="contained" color="primary" onClick={()=>navigate('/categorySelect')}>
             New Match
           </Button>
-          <Button variant="contained" color="primary">
+          <Button variant="contained" color="primary" onClick={()=>navigate('/sessions')}>
             Sessions
           </Button>
           <Button variant="contained" color="primary">
@@ -61,48 +63,3 @@ const Menu = () => {
 };
 
 export default Menu;
-
-
-/*import {Paper , Box, Button, Stack } from "@mui/material"
-
-const Menu = ()=>{
-    return(
-        <Box   
-            display={"flex"}
-            flexDirection={"column"}
-            justifyContent={"center"}
-            alignItems={"center"}
-            minHeight={'100vh'}
-            bgcolor={'rgba(54, 140, 238, 0.36)'}
-        >
-
-        <Paper 
-            elevation={24} 
-            sx={{display:'flex' ,justifyContent:'center',flexDirection:'column', padding: 4, width :130 , backgroundColor:'transparent'}}
-        >
-            <Stack spacing={2}>
-            <Button
-                variant="outlined"
-                color="primary"
-            >
-                new match
-            </Button>
-            <Button
-                variant="outlined"
-                color="primary"
-            >
-                sessions
-            </Button>
-            <Button
-                variant="outlined"
-                color="primary"
-            >
-                exit
-            </Button>
-            </Stack>
-        </Paper>
-        </Box>
-    )
-}
-
-export default Menu*/

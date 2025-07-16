@@ -4,8 +4,12 @@ import { apiCall } from '../services/apiClient'
 import { API_CONFIG , ROUTES} from '../config/settings'
 import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
+import { useNavigate } from 'react-router-dom'
 import {yupResolver} from "@hookform/resolvers/yup"
+import { useAuth } from '../context/AuthContext'
 const Login = () =>{
+    const navigate = useNavigate()
+    const {setAccessToken} = useAuth()
     const schema = yup.object().shape({
         email: yup.string()/*.email("invalid email")*/.required("email must be provided") ,
         password: yup.string().required("password must be provided")
@@ -17,7 +21,10 @@ const Login = () =>{
             return await response.json()
         },
         {
-            onSuccess:(data)=> console.log(data),
+            onSuccess:(data)=> {
+                setAccessToken(data.token)
+                navigate('/menu')
+            },
             onError:(error)=>console.log(error)
         }
     )
@@ -73,6 +80,7 @@ const Login = () =>{
                             variant="text"
                             color="primary"
                             sx={{mx:'auto' , display:'block'}}
+                            onClick={()=>navigate('/signup')}
                         >
                             don't have an account?
                         </Button>
