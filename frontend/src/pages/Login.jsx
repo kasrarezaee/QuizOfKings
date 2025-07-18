@@ -9,7 +9,7 @@ import {yupResolver} from "@hookform/resolvers/yup"
 import { useAuth } from '../context/AuthContext'
 const Login = () =>{
     const navigate = useNavigate()
-    const {setAccessToken} = useAuth()
+    const {setAccessToken , setUserInfo , userInfo} = useAuth()
     const schema = yup.object().shape({
         email: yup.string()/*.email("invalid email")*/.required("email must be provided") ,
         password: yup.string().required("password must be provided")
@@ -23,9 +23,14 @@ const Login = () =>{
         {
             onSuccess:(data)=> {
                 setAccessToken(data.token)
+                if(data.userRoles[0]!== undefined){
+                    setUserInfo(data.userRoles[0])
+                }else{
+                    setUserInfo(data.user[0])
+                }
                 navigate('/menu')
             },
-            onError:(error)=>console.log(error)
+            onError:(error)=>alert(error)
         }
     )
     const onSubmit = (data)=>{

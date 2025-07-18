@@ -118,7 +118,7 @@ class AuthService {
 
     signToken = async (data) => {
         try {
-            return jwt.sign(data, process.env.SECRET, { expiresIn: "120s" })
+            return jwt.sign(data, process.env.SECRET, { expiresIn: "1200s" })
         } catch (err) {
             console.log(process.env.SECRET)
             throw new Error(err + "an error occured")

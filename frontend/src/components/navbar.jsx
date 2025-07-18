@@ -13,13 +13,29 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import SettingsIcon from '@mui/icons-material/Settings';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-const pages = ['player stat' , 'leader board'];
-const settings = ['Logout' , 'about'];
 
 function Navbar() {
+  const {accessToken , userInfo} = useAuth() 
+  
+  const settings = ['Logout' , 'about'];
+  
+  let pages = ['player stats' , 'leader board'];
+
+  if (userInfo?.role_name === 'admin') {
+    pages = [...pages, 'manage users', 'design question', 'manage questions'];
+  } else if (userInfo?.role_name === 'question_designer') {
+    pages = [...pages, 'design question'];
+  } else if (userInfo?.role_name === 'moderator') {
+    pages = [...pages, 'manage questions'];
+  }
+
+
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const navigate = useNavigate()
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -28,12 +44,31 @@ function Navbar() {
     setAnchorElUser(event.currentTarget);
   };
 
-  const handleCloseNavMenu = () => {
+  const handleCloseNavMenu = (page) => {
     setAnchorElNav(null);
+    console.log(page)
+    switch(page){
+      case "player stats":
+        navigate(`/profile/${userInfo.user_id}`)
+        break
+      case "leader board":
+        navigate('/leaderboard')
+        break
+      case "manage users":
+        navigate('/users')
+        break
+      case "manage questions":
+        navigate('/questions')
+        break
+      case "design question":
+        navigate('/questionDesign')
+        break
+    }
   };
 
-  const handleCloseUserMenu = () => {
+  const handleCloseUserMenu = (setting) => {
     setAnchorElUser(null);
+    alert(setting)
   };
 
   return (
@@ -83,11 +118,11 @@ function Navbar() {
                 horizontal: 'left',
               }}
               open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
+              onClose={()=>handleCloseNavMenu('none')}
               sx={{mt:'45px', display: { xs: 'block', md: 'none' } }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                <MenuItem key={page} onClick={()=>handleCloseNavMenu(page)}>
                   <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
                 </MenuItem>
               ))}
@@ -116,7 +151,7 @@ function Navbar() {
             {pages.map((page) => (
               <Button
                 key={page}
-                onClick={handleCloseNavMenu}
+                onClick={()=>handleCloseNavMenu(page)}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
                 {page}
@@ -143,10 +178,10 @@ function Navbar() {
                 horizontal: 'right',
               }}
               open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
+              onClose={()=>handleCloseUserMenu('none')}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <MenuItem key={setting} onClick={()=>handleCloseUserMenu(setting)}>
                   <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
                 </MenuItem>
               ))}
@@ -159,25 +194,3 @@ function Navbar() {
 }
 export default Navbar;
 
-
-/*import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-
-export default function ButtonAppBar() {
-  return (
-    <Box>
-      <AppBar position="fixed">
-        <Toolbar>
-          <Button  color="inherit">Log out</Button>
-          
-        </Toolbar>
-      </AppBar>
-    </Box>
-  );
-}*/

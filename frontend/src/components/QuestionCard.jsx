@@ -1,12 +1,12 @@
-import { Paper, Typography, Avatar, Box } from "@mui/material";
+import { Paper, Typography, Avatar, Box  , Chip} from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
 import { Link } from "react-router-dom";
 
-const User = ({ username , user_id}) => {
+const QuestionCard = ({ question_id , status , title}) => {
   return (
     <Paper
       component={Link}
-      to={`/profile/${user_id}`}
+      to={`/questionAnswer/${question_id}/${title}`}
       elevation={8}
       sx={{
         padding: 1.5,
@@ -27,17 +27,24 @@ const User = ({ username , user_id}) => {
         transition: 'all 0.3s ease-in-out',
       }}
     >
-      <Avatar sx={{ bgcolor: 'white', color: '#1976d2' }}>
-        <PersonIcon />
-      </Avatar>
 
       <Box>
         <Typography variant="subtitle1" fontWeight="bold">
-          {username}
+          {question_id}
         </Typography>
+
+        <Chip  
+          label={status} 
+          sx={{ 
+            backgroundColor: 'rgba(255,255,255,0.2)', 
+            color: 'white',
+            fontWeight: 'bold'
+          }}
+        />
+
       </Box>
     </Paper>
   );
 };
 
-export default User;
+export default QuestionCard;

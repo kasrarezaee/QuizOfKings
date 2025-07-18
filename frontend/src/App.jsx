@@ -11,6 +11,10 @@ import Profile from "./pages/Profile"
 import ChatPage from "./pages/ChatPage"
 import CategorySelect from "./pages/CategorySelect"
 import Layout from "./layout/layout"
+import Users from "./pages/Users"
+import Questions from "./pages/Questions"
+
+
 function App() {
   const client = new QueryClient()
   return(
@@ -24,10 +28,13 @@ function App() {
               <Route path="/login" element={<Login/>}/>
               <Route path="/sessions" element={<Sessions/>}/>
               <Route path="/questionDesign" element={<QuestionDesign/>}/>
-              <Route path="/questionAnswer" element={<QuestionAnswer/>}/>
-              <Route path="/profile" element={<Profile/>}/>
+              <Route path="/questionAnswer/:question_id/:title" element={<QuestionAnswer/>}/>
+              <Route path="/profile/:user_id" element={<Profile/>}/>
               <Route path="/chat" element={<ChatPage/>}/>
               <Route path="/categorySelect" element={<CategorySelect/>}/>
+              <Route path="/leaderboard" element={<Users title="leader board"/>}/>
+              <Route path="/users" element={<Users title="users"/>}/>
+              <Route path="/questions" element={<Questions title={'manage'}/>}/>
             </Route>
           </Routes>
         </Router>

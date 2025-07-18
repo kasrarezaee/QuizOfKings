@@ -3,7 +3,7 @@ import Navbar from "../components/navbar";
 
 const Layout = ()=>{
     const location = useLocation()
-    const hideNavbarPaths = ['/login' , '/signup']
+    const hideNavbarPaths = ['/login' , '/signup' , '/questionDesign' , '/questionAnswer']
 
     const shouldHideNavbar = hideNavbarPaths.includes(location.pathname)
 
