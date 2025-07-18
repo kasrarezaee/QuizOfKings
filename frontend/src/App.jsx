@@ -13,6 +13,8 @@ import CategorySelect from "./pages/CategorySelect"
 import Layout from "./layout/layout"
 import Users from "./pages/Users"
 import Questions from "./pages/Questions"
+import Rounds from "./pages/Rounds"
+import RoundQuestions from "./pages/RoundQuestions"
 
 
 function App() {
@@ -28,13 +30,15 @@ function App() {
               <Route path="/login" element={<Login/>}/>
               <Route path="/sessions" element={<Sessions/>}/>
               <Route path="/questionDesign" element={<QuestionDesign/>}/>
+              <Route path="/chat/:sessionId/:senderId/:receiverId" element={<ChatPage/>}/>
               <Route path="/questionAnswer/:question_id/:title" element={<QuestionAnswer/>}/>
               <Route path="/profile/:user_id" element={<Profile/>}/>
-              <Route path="/chat" element={<ChatPage/>}/>
               <Route path="/categorySelect" element={<CategorySelect/>}/>
               <Route path="/leaderboard" element={<Users title="leader board"/>}/>
               <Route path="/users" element={<Users title="users"/>}/>
               <Route path="/questions" element={<Questions title={'manage'}/>}/>
+              <Route path="/rounds/:session_id" element={<Rounds/>}/>
+              <Route path="/round_questions/:round_id" element={<RoundQuestions/>}/>
             </Route>
           </Routes>
         </Router>

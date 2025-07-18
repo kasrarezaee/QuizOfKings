@@ -1,30 +1,44 @@
 import { Box , Paper, Typography, Button } from "@mui/material"
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import Session from "../components/Session"
+import Round from "../components/Round"
 import { useQuery } from "react-query";
 import { useAuth } from "../context/AuthContext";
 import { apiCall } from "../services/apiClient";
 import { API_CONFIG  , ROUTES} from "../config/settings";
+import { useNavigate, useParams } from "react-router-dom";
+import ChatIcon from '@mui/icons-material/Chat';
 
-const Sessions = ()=>{
-    const handleBack = () => {
-        window.history.back(); 
-    }
+const Rounds = ()=>{
+    const {session_id} = useParams()
 
     const {accessToken , userInfo} = useAuth()
 
-    const {data , isError , isLoading , error} = useQuery('sessions' , 
+    const navigate = useNavigate()
+
+    const {data , isError , isLoading , error} = useQuery('rounds' , 
       async ()=>{
-        const response = await apiCall(`${API_CONFIG.BASE_URL}${ROUTES.SESSIONS}user/${userInfo.user_id}` , 'GET' , accessToken , null)
+        const response = await apiCall(API_CONFIG.BASE_URL + ROUTES.SESSIONS + "session/" + session_id , 'GET' , accessToken , null)
         return await response.json()
       },
       {
-        enabled: !!userInfo?.user_id && !!accessToken,
-        // onSuccess:(data)=>console.log(data)
+        onSuccess:(data)=>console.log(data)
       }
-      
     )
 
+    const opponentId =
+      data && data.length > 0
+        ? (data[0].player1_id === userInfo.user_id
+            ? data[0].player2_id
+            : data[0].player1_id)
+        : null;
+        
+    // const handleClick = () => {
+    //   if (opponentId) {
+    //     // navigate(`/chat/${session_id}/${userInfo.user_id}/${opponentId}`);
+    //     navigate('/menu')
+    //   }
+      
+    // };
 
     return(
         <Box
@@ -38,17 +52,16 @@ const Sessions = ()=>{
         >
             
             <Button 
-              onClick={handleBack}
-              startIcon={<ArrowBackIcon />}
+              // onClick={handleClick}
+              onClick={()=>navigate(`/chat/${session_id}/${userInfo.user_id}/${opponentId}`)} 
+              startIcon={<ChatIcon />}
               variant="outlined"
               sx={{ 
-                alignSelf: 'flex-start', 
-                marginLeft: 4, 
-                marginTop: 2,
+                alignSelf: 'flex', 
                 textTransform: 'none',
               }}
             >
-              Back
+              CHAT
             </Button>
 
             
@@ -65,21 +78,20 @@ const Sessions = ()=>{
                 }}
             >
               <Typography variant="h4" sx={{ color: 'white', fontWeight: 'bold' }}>
-                Your Sessions
+                Rounds
               </Typography>
             </Box>
 
-            {data?.map((session , index)=>(
-              <Session 
-                key={index}
-                session_id = {session.session_id}
-                status = {session.session_status}  
-                opponent = {session.player1_id === userInfo.user_id?session.player2_id:session.player1_id}
+            { data?.map((round)=>(
+              <Round 
+                status = {round.round_status}  
+                opponent = {round.player1_id === userInfo.user_id?round.player2_id:round.player1_id}
+                round_id = {round.round_id}
               /> 
-            ))}
+            ))} 
             
         </Box>
     )
 }
 
-export default Sessions
+export default Rounds

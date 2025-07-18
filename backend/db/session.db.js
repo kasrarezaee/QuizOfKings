@@ -89,6 +89,7 @@ class SessionDB {
                                     JOIN rounds r ON s.session_id = r.session_id  
                                     WHERE s.session_id = $1`, [session_id])
 
+
         return rows
     }
 

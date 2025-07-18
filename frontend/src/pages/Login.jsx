@@ -30,7 +30,7 @@ const Login = () =>{
                 }
                 navigate('/menu')
             },
-            onError:(error)=>alert(error)
+            onError:(error)=>console.log(error)
         }
     )
     const onSubmit = (data)=>{

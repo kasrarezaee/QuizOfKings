@@ -53,7 +53,7 @@ const Menu = () => {
           <Button variant="contained" color="primary" onClick={()=>navigate('/sessions')}>
             Sessions
           </Button>
-          <Button variant="contained" color="primary">
+          <Button variant="contained" color="primary" onClick={()=>navigate('google.com/')}>
             Exit
           </Button>
         </Stack>
