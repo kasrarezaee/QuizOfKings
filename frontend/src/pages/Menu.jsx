@@ -1,8 +1,30 @@
 import { Paper, Box, Button, Stack, Typography } from "@mui/material";
+import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
+import { apiCall } from "../services/apiClient";
+import { API_CONFIG , ROUTES } from "../config/settings";
+import { useAuth } from "../context/AuthContext";
 
 const Menu = () => {
+
   const navigate = useNavigate()
+
+  const {accessToken , userInfo} = useAuth()
+
+  const mutation = useMutation(
+    async ()=>{
+      const response = await apiCall(API_CONFIG.BASE_URL + ROUTES.SESSIONS + "user/" + userInfo.user_id , 'POST' , accessToken)
+      return await response.json()
+    },
+    {
+      onSuccess: (data)=> navigate(`/categorySelect/${data[0].session_id}`)
+    }
+  )
+
+  const handleNewMatch = ()=>{
+    mutation.mutate()
+  }
+
   return (
     <Box
       display={"flex"}
@@ -47,7 +69,7 @@ const Menu = () => {
         }}
       >
         <Stack spacing={2}>
-          <Button variant="contained" color="primary" onClick={()=>navigate('/categorySelect')}>
+          <Button variant="contained" color="primary" onClick={handleNewMatch}>
             New Match
           </Button>
           <Button variant="contained" color="primary" onClick={()=>navigate('/sessions')}>

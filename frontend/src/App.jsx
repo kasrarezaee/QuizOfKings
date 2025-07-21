@@ -33,12 +33,12 @@ function App() {
               <Route path="/chat/:sessionId/:senderId/:receiverId" element={<ChatPage/>}/>
               <Route path="/questionAnswer/:question_id/:title" element={<QuestionAnswer/>}/>
               <Route path="/profile/:user_id" element={<Profile/>}/>
-              <Route path="/categorySelect" element={<CategorySelect/>}/>
+              <Route path="/categorySelect/:session_id" element={<CategorySelect/>}/>
               <Route path="/leaderboard" element={<Users title="leader board"/>}/>
               <Route path="/users" element={<Users title="users"/>}/>
               <Route path="/questions" element={<Questions title={'manage'}/>}/>
               <Route path="/rounds/:session_id" element={<Rounds/>}/>
-              <Route path="/round_questions/:round_id" element={<RoundQuestions/>}/>
+              <Route path="/round_questions/:round_id/:title" element={<RoundQuestions/>}/>
             </Route>
           </Routes>
         </Router>

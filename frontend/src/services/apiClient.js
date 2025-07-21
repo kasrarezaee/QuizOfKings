@@ -8,5 +8,7 @@ export const apiCall = async (url, method = 'GET', token = '', body = null) => {
         body: body ? JSON.stringify(body) : null
     });
 
+    console.log(body)
+
     return res;
 };

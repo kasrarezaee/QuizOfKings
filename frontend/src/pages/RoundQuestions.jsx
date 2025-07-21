@@ -13,11 +13,14 @@ import { apiCall } from "../services/apiClient";
 import { API_CONFIG, ROUTES } from "../config/settings";
 import { useParams, useNavigate } from "react-router-dom";
 import QuestionAnswer from "./QuestionAnswer";
+import { useState } from "react";
 
 const RoundQuestions = () => {
-  const { round_id } = useParams();
+  const { round_id , title} = useParams();
   const navigate = useNavigate();
   const { accessToken, userInfo } = useAuth();
+
+  const [session_id , setSessionId] = useState(null)
 
   const { data, isError, isLoading, error } = useQuery(
     ["questions", round_id],
@@ -31,7 +34,7 @@ const RoundQuestions = () => {
       return await response.json();
     },
     {
-      onSuccess: (data) => console.log(data),
+      onSuccess: (data) => {setSessionId(data[0].session_id); console.log(data)}
     }
   );
 
@@ -102,11 +105,13 @@ const RoundQuestions = () => {
               >
                 Question {index + 1}
               </Typography>
-              <QuestionAnswer title="review" question_id={question.question_id} />
+              <QuestionAnswer title={title} question_id={question.question_id} round_id = {round_id} session_id = {session_id} question = {question}/>
               <Divider sx={{ mt: 3 }} />
             </Box>
           </Fade>
         ))}
+
+        <Button variant="contained">finish round</Button>
       </Box>
     </Box>
   );

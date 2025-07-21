@@ -1,17 +1,32 @@
 import { Box , Button, Paper, TextField, Typography } from "@mui/material"
-import { useNavigate } from "react-router-dom"
-import { useQuery } from "react-query"
+import { useNavigate, useParams } from "react-router-dom"
+import { useMutation, useQuery } from "react-query"
 import { apiCall } from "../services/apiClient"
 import { API_CONFIG, ROUTES } from "../config/settings"
 import { useAuth } from "../context/AuthContext"
 import { useState } from "react"
 import Spinner from "../components/Spinner"
 const CategorySelect = () => {
+
   const navigate = useNavigate();
+  
+  const {session_id} = useParams()
+
   const { accessToken } = useAuth();
 
+  const handleCategorySelect = async (category_id)=>{
+    
+    console.log(category_id)
+    const response = await apiCall(API_CONFIG.BASE_URL + ROUTES.QUESTIONS + "random/" + category_id , 'GET' , accessToken)
+    const result = await response.json()  
+
+
+    round_mutation.mutate({category_id:category_id , round_questions: result})
+  
+  }
+
   const { data, isLoading, isError, error } = useQuery(
-    'categories',
+    ['categories'],
     async () => {
       const response = await apiCall(
         API_CONFIG.BASE_URL + ROUTES.CATEGORY + "random/random",
@@ -22,6 +37,25 @@ const CategorySelect = () => {
       return await response.json();
     }
   );
+
+  const round_mutation = useMutation(
+    async({category_id , round_questions})=>{
+    
+      const response = await apiCall(API_CONFIG.BASE_URL + ROUTES.ROUNDS, 'POST', accessToken
+              , {
+                  session_id: session_id,
+                  category_id: category_id,
+                  round_questions: round_questions
+              })
+      return await response.json()
+    },
+    {
+      onSuccess:(data)=>{
+        navigate(`/round_questions/${data[0].round_id}/answer`)
+      },
+      onError:(error)=>alert("error")
+    }
+  )
 
   return (
     <Box
@@ -64,7 +98,7 @@ const CategorySelect = () => {
           <Button
             key={index}
             variant="contained"
-            onClick={() => navigate('/questionAnswer')}
+            onClick={()=>handleCategorySelect(category.category_id)}
           >
             {category.name}
           </Button>

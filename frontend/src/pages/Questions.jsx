@@ -18,7 +18,7 @@ const Questions = ({title}) => {
     isLoading,
     error,
   } = useQuery(
-    ["Questions", title],
+    ["Questions", Math.random().toString()],
     async () => {
       const response = await apiCall(API_CONFIG.BASE_URL+ROUTES.QUESTIONS , "GET", accessToken, null);
       return await response.json();

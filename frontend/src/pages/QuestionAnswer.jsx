@@ -13,29 +13,41 @@ import { useAuth } from "../context/AuthContext";
 import { useParams } from "react-router-dom";
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import { useEffect, useState } from "react";
 
-const QuestionAnswer = (props=null) => {
+const QuestionAnswer = (props = null) => {
   const { accessToken, userInfo } = useAuth();
-//   let { title, question_id } = useParams();
-
-//   if (title === null && question_id === null) {
-//     title = props.title;
-//     question_id = props.question_id;
-//   }
 
   let { title: routeTitle, question_id: routeQuestionId } = useParams();
   let title = routeTitle ?? props?.title;
   let question_id = routeQuestionId ?? props?.question_id;
+  let session_id = props.session_id;
+  let round_id = props.round_id;
+  let question = props.question;
 
+  const [correctAnswer, setCorrectAnswer] = useState('');
+  const [selectedAnswer, setSelectedAnswer] = useState('');
+  const [answerEnable, setAnswerEnable] = useState(title === "answer");
 
-  const answer_enable = title === "answer";
   const review_enable = title === "review";
   const manage_enable = title === "manage";
 
+  
+  useEffect(() => {
+    if (!question) return;
+
+    
+    if (userInfo.user_id === question.player1_id) {
+      setSelectedAnswer(question.player1_answer);
+    } else {
+      setSelectedAnswer(question.player2_answer);
+    }
+
+    setCorrectAnswer(question.correct_answer); 
+  }, [question, userInfo.user_id]); 
+
   const { data } = useQuery(
-    ["question" , question_id],
+    ["question", question_id],
     async () => {
       const response = await apiCall(
         API_CONFIG.BASE_URL + ROUTES.QUESTIONS + question_id,
@@ -46,10 +58,65 @@ const QuestionAnswer = (props=null) => {
       return await response.json();
     },
     {
-      onSuccess: (data) => console.log(data),
-      onError:()=>console.log(question_id)
+      onError: () => console.log(question_id),
     }
   );
+
+  const handleSubmitAnswer = async (answer) => {
+    setSelectedAnswer(answer);
+
+    const response = await apiCall(
+      API_CONFIG.BASE_URL + ROUTES.ROUNDS + "submit",
+      'POST',
+      accessToken,
+      {
+        session_id: session_id,
+        round_id: round_id,
+        question_id: question_id,
+        user_id: userInfo.user_id,
+        answer: answer
+      }
+    );
+
+    const result = await response.json();
+    setCorrectAnswer(result[0].correct_answer);
+    setAnswerEnable(false);
+  };
+
+  const getButtonColor = (optionKey) => {
+    if (answerEnable) return 'info';
+
+    if (review_enable) {
+      
+      if (optionKey === selectedAnswer) {
+        if (selectedAnswer === correctAnswer) {
+          return 'success'; 
+        } else {
+          return 'error'; 
+        }
+      }
+
+      if (optionKey === correctAnswer) {
+        return 'success'; 
+      }
+
+      return 'info';
+    }
+
+    if (optionKey === correctAnswer) return 'success';
+    if (optionKey === selectedAnswer && selectedAnswer !== correctAnswer)
+      return 'error';
+
+    return 'info';
+  };
+
+  const commonButtonStyle = {
+    borderRadius: "12px",
+  };
+
+  const interactionStyle = answerEnable
+    ? { pointerEvents: 'auto', opacity: 1 }
+    : { pointerEvents: 'none', opacity: 0.6 };
 
   const handleConfirm = () => {
     const notes = "nothing";
@@ -123,7 +190,7 @@ const QuestionAnswer = (props=null) => {
   );
 
   const review_mutation = useMutation(async (question) => {
-    const response = await apiCall(
+    await apiCall(
       API_CONFIG.BASE_URL + ROUTES.QUESTIONS + question.question_id,
       "POST",
       accessToken,
@@ -146,7 +213,7 @@ const QuestionAnswer = (props=null) => {
           rgba(54, 140, 238, 0.36) 100%
         )`,
         padding: 2,
-        borderRadius:"20px"
+        borderRadius: "20px"
       }}
     >
       <Paper
@@ -173,68 +240,40 @@ const QuestionAnswer = (props=null) => {
         <Stack spacing={2}>
           <Button
             variant="contained"
-            color="info"
-            disabled={!answer_enable}
-            sx={{ borderRadius: "12px" }}
+            color={getButtonColor('A')}
+            onClick={() => handleSubmitAnswer('A')}
+            sx={{ ...commonButtonStyle, ...interactionStyle }}
           >
             {data?.[0]?.option_a}
           </Button>
           <Button
             variant="contained"
-            color="info"
-            disabled={!answer_enable}
-            sx={{ borderRadius: "12px" }}
+            color={getButtonColor('B')}
+            onClick={() => handleSubmitAnswer('B')}
+            sx={{ ...commonButtonStyle, ...interactionStyle }}
           >
             {data?.[0]?.option_b}
           </Button>
           <Button
             variant="contained"
-            color="info"
-            disabled={!answer_enable}
-            sx={{ borderRadius: "12px" }}
+            color={getButtonColor('C')}
+            onClick={() => handleSubmitAnswer('C')}
+            sx={{ ...commonButtonStyle, ...interactionStyle }}
           >
             {data?.[0]?.option_c}
           </Button>
           <Button
             variant="contained"
-            color="info"
-            disabled={!answer_enable}
-            sx={{ borderRadius: "12px" }}
+            color={getButtonColor('D')}
+            onClick={() => handleSubmitAnswer('D')}
+            sx={{ ...commonButtonStyle, ...interactionStyle }}
           >
             {data?.[0]?.option_d}
           </Button>
         </Stack>
       </Paper>
 
-      <Grid
-        container
-        spacing={2}
-        justifyContent="center"
-        mt={4}
-        maxWidth="sm"
-      >
-        <Grid item>
-          <Button
-            variant="outlined"
-            color="secondary"
-            startIcon={<NavigateBeforeIcon />}
-            disabled={!review_enable}
-            sx={{ display: review_enable ? 'inline-flex' : 'none' }}
-          >
-            Back
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button
-            variant="outlined"
-            color="secondary"
-            endIcon={<NavigateNextIcon />}
-            disabled={!review_enable}
-            sx={{ display: review_enable ? 'inline-flex' : 'none' }}
-          >
-            Next
-          </Button>
-        </Grid>
+      <Grid container spacing={2} justifyContent="center" mt={4} maxWidth="sm">
         <Grid item>
           <Button
             variant="contained"
