@@ -17,7 +17,7 @@ router
 
 router
   .route("/:id")
-  .get(allowRoles("moderator", "admin"), questionController.getQuestion)
+  .get(questionController.getQuestion)
   .delete(allowRoles("admin"), questionController.deleteQuestion)
   .post(allowRoles("moderator", "admin"), questionController.updateQuestion);
 

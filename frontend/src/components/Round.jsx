@@ -26,10 +26,10 @@ const Round = ({ status, opponent, round_id }) => {
         },
         {
             onError: () => alert('Error fetching round questions'),
-            onSuccess: (round_questions) => {
+            onSuccess: () => {
                 if (!opponentData || !opponentData[0]) return;
 
-                const isPlayer1 = userInfo.user_id === opponentData[0].player1_id;
+                const isPlayer1 = userInfo.user_id === opponentData[0].user_id;
                 setWhichPlayerYouAre(isPlayer1 ? 'player1' : 'player2');
             }
         }
@@ -43,12 +43,14 @@ const Round = ({ status, opponent, round_id }) => {
         if (!opponentData || !opponentData[0] || whichPlayerYouAre === '') return;
 
         const answerField = whichPlayerYouAre === 'player1'
-            ? opponentData[0].player1_answer
-            : opponentData[0].player2_answer;
+            ? roundQuestions[0].player1_answer
+            : roundQuestions[0].player2_answer;
 
         const answered = answerField !== null;
         setYouAnsweredThisRound(answered);
         setPageStatus(answered ? 'review' : 'answer');
+        
+        console.log(answerField)
     }, [whichPlayerYouAre, opponentData]);
 
     return (
