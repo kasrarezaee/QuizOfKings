@@ -46,8 +46,8 @@ const Round = ({ status, opponent, round_id , winner_id}) => {
         if (!opponentData || !opponentData[0] || whichPlayerYouAre === '') return;
 
         const answerField = whichPlayerYouAre === 'player1'
-            ? roundQuestions[0]?.player1_answer
-            : roundQuestions[0]?.player2_answer;
+            ? roundQuestions?.[0]?.player1_answer
+            : roundQuestions?.[0]?.player2_answer;
 
         const answered = answerField !== null;
         setYouAnsweredThisRound(answered);

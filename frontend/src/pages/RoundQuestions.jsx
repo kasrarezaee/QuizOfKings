@@ -52,8 +52,7 @@ const RoundQuestions = () => {
           }
       })
 
-      if (!allRoundsCompleted){
-        
+      if (!allRoundsCompleted || result.length!==3){        
         if(your_turn){
           navigate(`/categorySelect/${session_id}`)
         }else{
@@ -164,7 +163,7 @@ const RoundQuestions = () => {
           </Fade>
         ))}
 
-        <Button variant="contained" onClick={handleFinishRound}>finish round</Button>
+        <Button variant="contained" onClick={handleFinishRound} disabled={title!=='answer'}>finish round</Button>
       </Box>
     </Box>
   );

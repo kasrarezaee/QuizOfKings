@@ -5,8 +5,11 @@ const { query, closeConnection } = db
 class SessionDB {
 
     createSession = async (player1_id) => {
-        const { rows } = await query(`SELECT * FROM users ORDER BY RANDOM() LIMIT 1`)
-
+        // const { rows } = await query(`SELECT * FROM users ORDER BY RANDOM() LIMIT 1`)
+        const { rows } = await query(
+            `SELECT * FROM users WHERE user_id != $1 ORDER BY RANDOM() LIMIT 1`,
+            [player1_id]
+        );
         await query(`INSERT INTO sessions (player1_id , player2_id) 
                                        VALUES($1 , $2)`
             , [player1_id, parseInt(rows[0].user_id)])

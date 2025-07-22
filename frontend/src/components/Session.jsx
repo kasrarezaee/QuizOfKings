@@ -5,6 +5,7 @@ import { apiCall } from "../services/apiClient";
 import { API_CONFIG, ROUTES } from "../config/settings";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 
 const Session = ({winner_id , status , opponent , session_id}) => {
     
@@ -20,6 +21,8 @@ const Session = ({winner_id , status , opponent , session_id}) => {
         }
     )
     
+   
+
     return (
         <Paper
             elevation={8}
@@ -61,9 +64,9 @@ const Session = ({winner_id , status , opponent , session_id}) => {
               icon={<SportsEsportsIcon />} 
             //   label={status}
               label={
-                      winner_id
-                        ? (winner_id === userInfo.user_id ? userInfo.username : data?.[0]?.username)
-                        : 'pending'
+                        winner_id
+                        ? (winner_id === userInfo.user_id ? 'YOU' : data?.[0]?.username)
+                        : (status === 'COMPLETED'? 'draw' :'pending')
                     }
 
               sx={{ 
