@@ -6,7 +6,7 @@ import { API_CONFIG, ROUTES } from "../config/settings";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 
-const Session = ({status , opponent , session_id}) => {
+const Session = ({winner_id , status , opponent , session_id}) => {
     
     const {accessToken , userInfo} = useAuth()
 
@@ -59,7 +59,13 @@ const Session = ({status , opponent , session_id}) => {
               component={Link}
               to={`/rounds/${session_id}`}
               icon={<SportsEsportsIcon />} 
-              label={status} 
+            //   label={status}
+              label={
+                      winner_id
+                        ? (winner_id === userInfo.user_id ? userInfo.username : data?.[0]?.username)
+                        : 'pending'
+                    }
+
               sx={{ 
                 backgroundColor: 'rgba(255,255,255,0.2)', 
                 color: 'white',

@@ -7,7 +7,7 @@ import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-const Round = ({ status, opponent, round_id }) => {
+const Round = ({ status, opponent, round_id , winner_id}) => {
     const { accessToken, userInfo } = useAuth();
 
     const { data: opponentData, isLoading, isError, error } = useQuery(
@@ -26,11 +26,14 @@ const Round = ({ status, opponent, round_id }) => {
         },
         {
             onError: () => alert('Error fetching round questions'),
-            onSuccess: () => {
+            onSuccess: (data) => {
                 if (!opponentData || !opponentData[0]) return;
 
-                const isPlayer1 = userInfo.user_id === opponentData[0].user_id;
+                // const isPlayer1 = userInfo.user_id === opponentData[0].user_id;
+                const isPlayer1 = userInfo.user_id === data[0].player1_id
                 setWhichPlayerYouAre(isPlayer1 ? 'player1' : 'player2');
+
+                console.log(isPlayer1)
             }
         }
     );
@@ -43,8 +46,8 @@ const Round = ({ status, opponent, round_id }) => {
         if (!opponentData || !opponentData[0] || whichPlayerYouAre === '') return;
 
         const answerField = whichPlayerYouAre === 'player1'
-            ? roundQuestions[0].player1_answer
-            : roundQuestions[0].player2_answer;
+            ? roundQuestions[0]?.player1_answer
+            : roundQuestions[0]?.player2_answer;
 
         const answered = answerField !== null;
         setYouAnsweredThisRound(answered);
@@ -92,6 +95,7 @@ const Round = ({ status, opponent, round_id }) => {
                 to={pageStatus ? `/round_questions/${round_id}/${pageStatus}` : undefined}
                 icon={<SportsEsportsIcon />}
                 label={status}
+                    
                 sx={{
                     backgroundColor: 'rgba(255,255,255,0.2)',
                     color: 'white',

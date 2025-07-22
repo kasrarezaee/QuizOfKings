@@ -7,7 +7,7 @@ import {
   Divider,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useQuery } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import { useAuth } from "../context/AuthContext";
 import { apiCall } from "../services/apiClient";
 import { API_CONFIG, ROUTES } from "../config/settings";
@@ -22,8 +22,61 @@ const RoundQuestions = () => {
 
   const [session_id , setSessionId] = useState(null)
 
+  const get_turn = async (session_id) => {
+      const response = await apiCall(API_CONFIG.BASE_URL + ROUTES.ROUNDS + "turn/" + "session_id/" + session_id, 'GET', accessToken)
+      const result = await response.json()
+      if (result == userInfo.user_id) {
+          return true
+      }
+      return false
+  }
+
+  const handleFinishRound = async ()=>{
+    
+    //get turn 
+
+    //check if the user complete all three round or not
+      //if not , if its user turn go to category select else go to menu wating for the next round
+      //if it is , send finish session request
+  
+      const your_turn = await get_turn(session_id)
+
+      const response = await apiCall(API_CONFIG.BASE_URL + ROUTES.SESSIONS + "session/" + session_id, 'GET', accessToken)
+      const result = await response.json()
+  
+      
+      let allRoundsCompleted = true
+      result.forEach(e => {
+          if (e.round_status == 'ACTIVE') {
+              allRoundsCompleted = false
+          }
+      })
+
+      if (!allRoundsCompleted){
+        
+        if(your_turn){
+          navigate(`/categorySelect/${session_id}`)
+        }else{
+          navigate('/menu')
+        }
+
+      }else if(allRoundsCompleted && result.length === 3){
+        finish_mutation.mutate()
+      }
+  }
+
+  const finish_mutation = useMutation(
+    async ()=>{
+      const response = await apiCall(API_CONFIG.BASE_URL + ROUTES.SESSIONS + "finish/" + session_id, 'POST', accessToken)
+      return await response.json()
+    },
+    {
+      onSuccess:(data)=> navigate('/menu')
+    }
+  )
+
   const { data, isError, isLoading, error } = useQuery(
-    ["questions", round_id],
+    ["questions", userInfo.user_id,toString()],
     async () => {
       const response = await apiCall(
         API_CONFIG.BASE_URL + ROUTES.ROUNDS + "round_id/" + round_id,
@@ -111,7 +164,7 @@ const RoundQuestions = () => {
           </Fade>
         ))}
 
-        <Button variant="contained">finish round</Button>
+        <Button variant="contained" onClick={handleFinishRound}>finish round</Button>
       </Box>
     </Box>
   );

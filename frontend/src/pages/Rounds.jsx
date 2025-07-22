@@ -87,6 +87,7 @@ const Rounds = ()=>{
                 status = {round.round_status}  
                 opponent = {round.player1_id === userInfo.user_id?round.player2_id:round.player1_id}
                 round_id = {round.round_id}
+                winner_id = {round.winner_id}
               /> 
             ))} 
             

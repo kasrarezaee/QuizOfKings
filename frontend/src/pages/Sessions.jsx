@@ -73,7 +73,8 @@ const Sessions = ()=>{
               <Session 
                 key={index}
                 session_id = {session.session_id}
-                status = {session.session_status}  
+                status = {session.session_status}
+                winner_id = {session.winner_id}  
                 opponent = {session.player1_id === userInfo.user_id?session.player2_id:session.player1_id}
               /> 
             ))}
