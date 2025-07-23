@@ -126,7 +126,7 @@ const SignUp = () =>{
                         mb={2}
                         align="center"                    
                     >
-                        Login
+                        Sign Up
                     </Typography>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <TextField
